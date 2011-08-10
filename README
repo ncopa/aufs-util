@@ -1,0 +1,63 @@
+
+Utilities for aufs2
+http://aufs.sf.net
+J. R. Okajima
+
+These utilities are always necessary for aufs2.
+If you forget to install them, your aufs may not work correctly.
+And these are not for aufs1 essentially, except aubrsync. See below in
+detail.
+
+Makefile in this tree has some customizable make-variables.
+- CPPFLAGS
+  specify the include path if necessary.
+  Some of linux kernel header files are necessary including
+  linux/aufs_type.h. If you have installed kernel header files to
+  /usr/include, then you may not need to specify CPPFLAGS.
+  Otherwise you need to do something like this sample.
+  + run "make headers_install" in your kernel source tree, and
+    $LinuxSrc/usr/include is created and header files are installed
+    there.
+  + if you build aufs2 as module from aufs2-standalone.git, then
+    $Aufs2Stdalone/usr/include is created and header files are
+    installed there.
+  + and specify
+	CPPFLAGS="-I $LinuxSrc/usr/include -I $Aufs2Stdalone/usr/include"
+
+- DESTDIR
+  specify your install path if necessary.
+  some commands have to be installed under /sbin.
+
+o /sbin/mount.aufs, /sbin/umount.aufs
+  Helpers for util-linux-ng package. You should NOT invoke them
+  manually. Just install them by "make install".
+
+o /sbin/auplink
+  Handles aufs pseudo-link at remount/unmount time. You can invoke it
+  manually at anytime.
+
+o /usr/bin/auchk
+  Similar to generic fsck. Checks whether a branch is healthy or not
+  from aufs's point of view.
+
+o /usr/bin/aubrsync
+  Move files from the upper writable branch to the lower branch.
+  If you use this script with aufs1, then you need to install aufs.shlib
+  to /usr/lib/aufs.shlib. Currently only the 20080211 version is tested
+  for aufs1.
+  The development of this script is sponcered by ASUSTek Computer Inc.
+  (http://www.asus.com/).
+  Kindly they agreed that I keep my aufs work as free software as it has
+  been.
+
+o /etc/default/aufs
+  A library for shell scripts.
+
+o /usr/lib/libau.so
+  A dynamic link library for "readdir(3) in user-space".
+  If you need this , then run "make libau.so install_ulib". And refer to
+  the aufs manual in detail.
+
+# Local variables: ;
+# mode: text;
+# End: ;
