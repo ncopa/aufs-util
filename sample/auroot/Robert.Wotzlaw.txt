@@ -1,0 +1,84 @@
+Date: Thu, 1 Jul 2010 19:24:21 +0200 (CEST)
+From: Robert Wotzlaw <Robert.Wotzlaw@web.de>
+To: aufs-users@lists.sourceforge.net
+Message-ID: <1011860217.773505.1278005061675.JavaMail.fmail@mwmweb073>
+Subject: Publish the script bldchraufs "Build a chroot environment based on
+	AUFS"
+
+Mr. Junjiro R. Okajima,
+
+it would be a great pleasure for me, if You could publish the script on Your
+proposed git repository under the address aufs2-util.git/sample/auroot/. I
+have made some corrections and rewrite parts of chapter ten. Append the script
+hal.new at bldchraufs and renamed bldchraufs to bldchraufs.aio. The extension
+"aio" stand for "all in one". Create the new chapter four with instructions
+how to extract the scripts bldchraufs and hal.new from bldchraufs.aio. Please,
+could You take a look of the new version.
+
+Before I answer to Your suggestion and question, I have apologize me. You
+found to letters with the same contents. This was my fault. I haven't realized
+that the email server sends a copy of a received email to all listed members.
+I thought, web.de my email provider couldn't deliver the email to You and so I
+send it a second time. That's the burden of the electronic life.
+
+Your suggestion putting all the code in control structures is clearly the
+better way, but - and now come the great but - the idea behind the script is
+a simple introduction for the build of a chroot environment with the aid of
+AUFS. I think, the proposed control structures will hide the idea. For people
+like me it wasn't very easy to understand what AUFS can do for us. It was like
+reading UNIX manual pages. My experience is, UNIX manual pages aren't aids for
+novice. It's more a hint, go a head, look for an example and come back if you
+have enough experience. I personally learn much by examples and in the most
+cases I get the idea. With this experience in mind I wrote the script. The
+script should be more a base to help manifest extensive ideas based on AUFS.
+The writing of the script gave me more experience to make better decisions
+concerning AUFS and the executing of an operation system under a chroot envi-
+ronment. Perhaps other peoples want participate on this experience.
+
+During the writing of the script I thought, why not give the user a switch
+in the GNOME Desktop log in screen to run the session in the chroot environ-
+ment. A second thought was, why not building up the chroot environment on a
+persistent base. The realization of the first idea is beyond my knowledge.
+Perhaps other people grasp the idea. The second idea is clearly a task for a
+script, that need control structures for its realization.
+
+And now I will answer to Your question concerning the hal.new script. The
+script hal.new is a corrected version of the start up script hal. The propose
+of the hal script is the start of the HAL (Hardware Abstraction Layer) daemon
+hald. HAL is one of the interfaces between Udev and D-Bus. Without a working
+hald the NetworkManger, UPower and the PolicyKit have problems under a running
+GNOME Desktop session. The Execution of a GNOME Desktop session in a chroot
+environment needs a new start of the dbus and the gdm scripts. At start of the
+gdm script the script checks if a hald is running. If not, gdm start the hal
+script. The starting hal script checks if the script is running in a chroot
+environment. If the answer is yes, the script exit with the following error
+message:
+
+ Can't start Hardware abstraction layer - detected chrooted session
+
+You find the code that checks the chroot session under the line 64 in the file
+hal.org. The file hal.org is a copy of hal. Hal is located in the directory
+/etc/init.d/.
+
+In the Internet I found a discussion between a Debian and Ubuntu developer,
+concerning the above mentioned error message. One of them suggested that
+the check shouldn't run with the start option. The check should only run du-
+ring a restart of the script. The other agreed. I lost the address of the
+Internet site.
+
+In the changed script hal.new I pushed the code in the function check_hal_
+prerequisites() and put the function into the case assignment under the 
+restart|force-reload branch. Before the start - see chapter five, step nine
+of the script bldchraufs - the user replace the script hal under the directory
+/tmp/jail/etc/init.d/ with the contents of the script hal.new. The new contents
+guaranties an error free start of the hal daemon in the chroot environment.
+
+Regards,
+Robert Wotzlaw
+
+Attachments:
+1. All in one file bldchraufs.aio,v 0.1 2010-07-01 16:57:54+02:00
+2. HAL init script hal.org
+___________________________________________________________
+WEB.DE DSL ab 19,99 Euro/Monat. Bis zu 150,- Euro Startguthaben und 
+50,- Euro Geldprämie inklusive! https://freundschaftswerbung.web.de
