@@ -23,7 +23,7 @@
 
 int main(int argc, char *argv[])
 {
-	if (!strncmp(AUFS_VERSION, "2.2", 3)
+	if (!strncmp(AUFS_VERSION, "3.0", 3)
 	    && (sizeof(AUFS_VERSION) - 1 == 3
 		|| AUFS_VERSION[3] == '-'))
 		return 0;
