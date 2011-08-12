@@ -104,7 +104,7 @@ will see whiteout-base or whplink-dir on the added RO branch.
 
 If a process is referencing the file/directory on the deleting branch
 (by open, mmap, current working directory, etc.), aufs will return an
-error EBUSY. In this case, a script `aubusy' (in aufs2-util.git) is
+error EBUSY. In this case, a script `aubusy' (in aufs-util.git and aufs2-util.git) is
 useful to identify which process (and which file) makes the branch busy.
 .
 .TP
@@ -1178,7 +1178,8 @@ general. Of course, you will need system memory. This is a generic
 
 .\" ----------------------------------------------------------------------
 .SH Using libau.so
-There is a dynamic shared object library called libau.so in aufs2-util
+There is a dynamic shared object library called libau.so in aufs-util
+or aufs2-util
 GIT tree. This library provides several useful functions which wrap the
 standard library functions such as,
 .RS
@@ -1191,7 +1192,7 @@ pathconf, fpathconf
 To use libau.so,
 .RS
 .Bu
-install by "make install_ulib" under aufs2-util GIT tree
+install by "make install_ulib" under aufs-util (or aufs2-util) GIT tree
 .Bu
 set the environment variable "LD_PRELOAD=libau.so", or configure
 /etc/ld.so.preload
