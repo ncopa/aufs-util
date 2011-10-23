@@ -272,8 +272,7 @@ static int do_plink(char *cwd, int cmd, int nbr, char *br[])
 	for (i = 0; i < nbr; i++) {
 		//puts(br[i]);
 		p = strchr(br[i], '=');
-		if (strcmp(p + 1, AUFS_BRPERM_RW)
-		    && strcmp(p + 1, AUFS_BRPERM_RWNLWH))
+		if (strncmp(p + 1, AUFS_BRPERM_RW, sizeof(AUFS_BRPERM_RW) - 1))
 			continue;
 
 		*p = 0;

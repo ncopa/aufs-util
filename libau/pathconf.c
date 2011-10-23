@@ -42,7 +42,7 @@ static long do_fpathconf(int fd, int name)
 	int wbr_fd, e;
 
 	err = -1;
-	wbr_fd = ioctl(fd, AUFS_CTL_WBR_FD);
+	wbr_fd = ioctl(fd, AUFS_CTL_WBR_FD, NULL);
 	if (wbr_fd >= 0) {
 		if (!libau_dl_fpathconf())
 			err = real_fpathconf(wbr_fd, name);
