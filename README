@@ -36,6 +36,10 @@ Makefile in this tree has some customizable make-variables.
     installed there.
   + and specify
 	CPPFLAGS="-I $LinuxSrc/usr/include -I $AufsStdalone/usr/include"
+  Note that your distribution may contain an obsoleted version of
+  aufs_type.h in /usr/include/linux or something. When you build aufs
+  utilities, make sure that your compiler refers the correct aufs header
+  file which is built by "make headers_install."
 
 - DESTDIR
   specify your install path if necessary.
