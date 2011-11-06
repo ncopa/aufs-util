@@ -47,7 +47,8 @@ static int do_ibusy(char *inum, int fd, struct aufs_ibusy *ibusy)
 	err = ioctl(fd, AUFS_CTL_IBUSY, ibusy);
 	if (!err && ibusy->h_ino)
 		printf("i%llu\tb%d\thi%llu\n",
-		       ibusy->ino, ibusy->bindex, ibusy->h_ino);
+		       (unsigned long long)ibusy->ino, ibusy->bindex,
+		       (unsigned long long)ibusy->h_ino);
 
 out:
 	return err;
