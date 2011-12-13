@@ -148,6 +148,7 @@ The files are created per an aufs and per a branch filesystem, and
 unlinked. So you
 cannot find this file, but it exists and is read/written frequently by
 aufs.
+When the specified file already exists, then mount(8) returns an error.
 (cf. External Inode Number Bitmap, Translation Table and Generation Table).
 
 If you enable CONFIG_SYSFS, the path of xino files are not shown in
