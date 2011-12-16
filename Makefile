@@ -15,6 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
+HOSTCC ?= cc
 CFLAGS += -I./libau
 CFLAGS += -O -Wall
 
@@ -83,6 +84,7 @@ aufs.5: aufs.in.5 c2tmac
 	}' aufs.in.5 >> $@
 	chmod a-w $@
 
+c2sh c2tmac ver: CC = ${HOSTCC}
 .INTERMEDIATE: c2sh c2tmac ver
 
 Install = install -o root -g root -p
