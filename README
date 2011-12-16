@@ -82,6 +82,13 @@ o /usr/lib/libau.so
   If you need this , then run "make libau.so install_ulib". And refer to
   the aufs manual in detail.
 
+
+Contributions
+- Michael S. Zick wrote good examples (currently one example), and made
+  them public at
+	http://hg.minimodding.com/repos/aufs/auroot.hg/
+
+
 # Local variables: ;
 # mode: text;
 # End: ;
