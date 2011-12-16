@@ -45,6 +45,13 @@ Makefile in this tree has some customizable make-variables.
   specify your install path if necessary.
   some commands have to be installed under /sbin.
 
+- HOSTCC
+  specify the compiler on host side when cross-compiling, otherwise you
+  can ignore this make-variable.
+  For cross-compiling, use CC for cross-compiler (target side) and HOSTCC
+  for native (host side) compiler, since this package requires buiding
+  and running some small internal tools.
+
 o /sbin/mount.aufs, /sbin/umount.aufs
   Helpers for util-linux-ng package. You should NOT invoke them
   manually. Just install them by "make install".
