@@ -21,6 +21,12 @@ but the "aufs3.10" branch doesn't exit in this repository, then
 Also you can view all branches by
 	$ git branch -a
 
+Note: The 3.x-rcN branch is to be used with `rc' kernel versions ONLY.
+The minor version number, 'x' in '3.x', of aufs may not always
+follow the minor version number of the kernel.
+Because changes in the kernel that cause the use of a new
+minor version number do not always require changes to aufs-util.
+
 Makefile in this tree has some customizable make-variables.
 - CPPFLAGS
   specify the include path if necessary.
@@ -30,7 +36,7 @@ Makefile in this tree has some customizable make-variables.
   Otherwise you need to do something like this sample.
   + run "make headers_install" in your kernel source tree, and
     $LinuxSrc/usr/include is created and header files are installed
-    there.
+    there by default.
   + if you build aufs3 as module from aufs3-standalone.git, then
     $AufsStdalone/usr/include is created and header files are
     installed there.
