@@ -49,7 +49,7 @@ mntpnt=$(echo $mntent | cut -f2 -d' ')
 
 SetDir br "$2"
 mntopts=$(MntOpts "$1")
-si=$(echo $mntopts | sed -e 's/^.*,si=\([^,]*\),.*$/\1/')
+si=$(echo $mntopts | sed -e 's/^.*,si=\([^,]*\),*.*$/\1/')
 d=/sys/fs/aufs/si_$si
 if [ -r $d/br0 ]
 then
