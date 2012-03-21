@@ -251,6 +251,9 @@ This is default value.
 .B sum
 df(1)/statfs(2) returns the total number of blocks and inodes of
 all branches.
+When the block size of all branches are not equal, aufs choses the
+smallest one and calculate the number of blocks (including bavail and
+bfree).
 Note that there are cases that systemcalls may return ENOSPC, even if
 df(1)/statfs(2) shows that aufs has some free space/inode.
 .
