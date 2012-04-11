@@ -33,7 +33,8 @@ system. e.g. "sudo sh ./auroot.sh /tmp/jail /etc/init.d/apache2 start"
 EOF
 
 dir="$1"
-mkdir -p "$dir" $tmp.rw $tmp.ro
+mkdir -p "$dir" "$tmp"
+mount -t tmpfs none "$tmp"
 
 # a sample for generic mount
 #mount -o ro,rbind / $tmp.ro
@@ -45,12 +46,10 @@ f()
 {
 	mntpnt="$1"
 	name="$2"
-	rw="$tmp.rw.$name"
-	ro="$tmp.ro.$name"
+	rw="$tmp/rw.$name"
 
-	mkdir -p "$rw" "$ro"
-	mount -o ro,bind "$mntpnt" "$ro"
-	mount -t aufs -o br:"$rw":"$ro" aufs "$dir$mntpnt"
+	mkdir -p "$rw"
+	mount -t aufs -o br:"$rw":"$mntpnt"=ro aufs "$dir$mntpnt"
 }
 
 f / root
