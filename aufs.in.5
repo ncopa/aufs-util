@@ -685,6 +685,15 @@ support-able largest inode number on a branch is less than
 This is the current limitation of aufs.
 On 64bit environment, this limitation becomes more strict and the
 supported largest inode number is less than LLONG_MAX/8\-1.
+In order to estimate the size of the table for your readonly branch fs,
+try
+
+.nf
+$ echo $((4 * $(sudo find /branch_fs -xdev -printf "%i\\n" |
+	sort -n | tail -n 1)))
+.fi
+
+For 64bit environment, replace 4 by 8 in above equation.
 
 The xino files are always hidden, i.e. removed. So you cannot
 do `ls \-l xino_file'.
@@ -737,6 +746,17 @@ deleted.
 You can truncate it anytime you like if you specify `trunc_xib' mount
 option. But when the accessed inode number was not deleted, nothing
 will be truncated.
+The truncation is essentially equivalent to
+
+.nf
+$ cp --sparse=always <current xino file> <new xino file> &&
+	rm <current xino file>
+.fi
+
+It means that you have two xino files during the copy, and you should
+pay attention to the free space of the filesystem where the xino file is
+located.
+
 If you do not want to truncate it (it may be slow) when you delete a
 branch, specify `notrunc_xib' after `del' mount option.
 For the table, see trunc_xino_path=BRANCH, itrunc_xino=INDEX, trunc_xino
