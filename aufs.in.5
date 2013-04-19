@@ -66,7 +66,9 @@ be rejected too.
 
 After mounting aufs or adding a branch, if you move a branch under
 another branch and make it descendant of another branch, aufs will not
-work correctly.
+work correctly. By default, aufs prohibits such operation internally,
+but there left a way to do.
+(cf. Branch Syntax).
 .
 .TP
 .B [ add | ins ]:index:BRANCH
@@ -558,6 +560,16 @@ But I am afraid a filesystem which does not support link(2) natively
 will fail in other place such as copy-up.
 Use this as `<branch_dir>=rw+nolwh'.
 Also you may want to try `noplink' mount option, while it is not recommended.
+.
+.TP
+.B unpin
+By default, aufs sets `pin' to the branch dir, which means that users
+cannot remove nor rename the branch top dir as if it were a mount\-point.
+In some cases and some users may need to rename the branch top dir. So
+this attribute is implemented. If you specify `unpin' as a branch
+attribute, it stops behaving as a mount\-point and you can rename the
+branch top dir.
+Needless to say, if you remove the branch top dir, then aufs cannot work.
 
 .\" .SS FUSE as a branch
 .\" A FUSE branch needs special attention.
