@@ -1499,6 +1499,15 @@ Since aufs has several filename prefixes reserved, the maxmum filename
 length is shorter than ordinary 255. Actually \*[AUFS_MAX_NAMELEN]
 (defined as ${AUFS_MAX_NAMELEN}). This
 value should be specified as `namlen=' when you mount NFS.
+The name of the branch top directory has another
+limit. When you set the module parameter `brs' to 1 (default), then you
+can see the branch pathname via /sys/fs/aufs/si_XXX/brNNN. Here it is
+printed with its branch attributes such as `=rw' or `=ro+wh'. Since all
+the sysfs entries have the size limit of 4096 bytes, the length of the
+branch path becomes shorter than 4096. Actually you can specify any
+branch with much longer names, but you will meet some troubles when you
+remount later because remounting runs the aufs mount helper internally
+and it tries reading /sys/fs/aufs/si_XXX/brNNN.
 .RE
 
 
