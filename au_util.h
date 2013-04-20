@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Junjiro R. Okajima
+ * Copyright (C) 2005-2013 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <error.h>
 
-#define AuVersion "aufs-util for aufs3.0 and later"
+#define AuVersion "aufs-util for aufs3.2 and later"
 
 /*
  * error_at_line() is decleared with (__printf__, 5, 6) attribute,
