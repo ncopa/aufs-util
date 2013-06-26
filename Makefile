@@ -42,7 +42,7 @@ endif
 Cmd = aubusy auchk aubrsync
 Man = aufs.5
 Etc = etc_default_aufs
-Bin = auibusy auplink mount.aufs umount.aufs #auctl
+Bin = auibusy aumvdown auplink mount.aufs umount.aufs #auctl
 BinObj = $(addsuffix .o, ${Bin})
 LibUtil = libautil.a
 LibUtilObj = proc_mnt.o br.o plink.o mtab.o
@@ -88,7 +88,7 @@ c2sh c2tmac ver: CC = ${HOSTCC}
 .INTERMEDIATE: c2sh c2tmac ver
 
 Install = install -o root -g root -p
-install_sbin: File = auibusy auplink mount.aufs umount.aufs
+install_sbin: File = auibusy aumvdown auplink mount.aufs umount.aufs
 install_sbin: Tgt = ${DESTDIR}/sbin
 install_ubin: File = aubusy auchk aubrsync #auctl
 install_ubin: Tgt = ${DESTDIR}/usr/bin
