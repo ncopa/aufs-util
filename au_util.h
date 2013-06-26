@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <error.h>
 
-#define AuVersion "aufs-util for aufs3.2 and later"
+#define AuVersion "aufs-util for aufs3.9 and later"
 
 /*
  * error_at_line() is decleared with (__printf__, 5, 6) attribute,
