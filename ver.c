@@ -25,7 +25,7 @@
 int main(int argc, char *argv[])
 {
 	regex_t preg;
-	const char *pat = "^3\\.[0-9](-|$)";
+	const char *pat = "^3\\.[01](-|$)";
 
 	if (regcomp(&preg, pat, REG_EXTENDED | REG_NOSUB))
 		AuFin("regcomp");
