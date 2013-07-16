@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
 LibSoMajor = 2
-LibSoMinor = 6
+LibSoMinor = 7
 LibSo = libau.so
 LibSoObj = libau.o \
 	rdu_lib.o rdu.o rdu64.o \
