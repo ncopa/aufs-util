@@ -142,7 +142,7 @@ int Rdu_READDIR_R(DIR *dir, struct Rdu_DIRENT *de, struct Rdu_DIRENT **rde)
 	if (LibAuTestFunc(Rdu_READDIR_R))
 		return rdu_readdir(dir, de, rde);
 	else if (!Rdu_DL_READDIR_R())
-		return Rdu_READDIR_R(dir, de, rde);
+		return Rdu_REAL_READDIR_R(dir, de, rde);
 	else
 		return errno;
 }
