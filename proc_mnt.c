@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#define _GNU_SOURCE /* getmntent_r */
 #include <sys/types.h>
 #include <errno.h>
 #include <mntent.h>
@@ -53,11 +54,25 @@ static void copy_ent(struct mntent *dst, struct mntent *src)
 
 }
 
+/*
+ * Ideally the mounted aufs should be unmounted even if its mntpnt has very long
+ * pathname. In other words, if umount.aufs cannot handle a long pathname, then
+ * mount.aufs should reject in the beginning.
+ * getmntent(3) in glibc reads 4096 bytes for a single mnt entry. I agree it is
+ * large enough. And mount(8) rejects too long pathname. It is OK too. As long
+ * as 4095 (4096 - 1) bytes pathname succeeds mounting, then it should be
+ * unmounted flawlessly.
+ * Testing on Debian v7 (wheezy) succeeded mounting 4095 bytes pathname, but
+ * failed unmounting. I don't like this unbalancing. So replace getmntent() by
+ * getmntent_r() with larger buffer. Obviously this is less important since such
+ * long pathname is very rare.
+ */
 int au_proc_getmntent(char *mntpnt, struct mntent *rent)
 {
 	int found;
-	struct mntent *p;
+	struct mntent *p, e;
 	FILE *fp;
+	char a[4096 + 1024];
 
 	fp = setmntent(ProcMounts, "r");
 	if (!fp)
@@ -66,7 +81,7 @@ int au_proc_getmntent(char *mntpnt, struct mntent *rent)
 	/* find the last one */
 	memset(rent, 0, sizeof(*rent));
 	found = 0;
-	while ((p = getmntent(fp)))
+	while ((p = getmntent_r(fp, &e, a, sizeof(a))))
 		if (!strcmp(p->mnt_dir, mntpnt)) {
 			Dpri("%s, %s, %s, %s, %d, %d\n",
 			     p->mnt_fsname, p->mnt_dir, p->mnt_type,
