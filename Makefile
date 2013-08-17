@@ -45,7 +45,7 @@ Etc = etc_default_aufs
 Bin = auibusy aumvdown auplink mount.aufs umount.aufs #auctl
 BinObj = $(addsuffix .o, ${Bin})
 LibUtil = libautil.a
-LibUtilObj = proc_mnt.o br.o plink.o mtab.o
+LibUtilObj = perror.o proc_mnt.o br.o plink.o mtab.o
 LibUtilHdr = au_util.h
 export
 

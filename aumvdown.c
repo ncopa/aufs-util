@@ -31,11 +31,18 @@
 #include <linux/aufs_type.h>
 #include "au_util.h"
 
+enum {
+	INTERACTIVE	= 1,
+	VERBOSE		= (1 << 1),
+};
+
 static struct option opts[] = {
 	{"interactive",	no_argument,	NULL,	'i'},
 	{"verbose",	no_argument,	NULL,	'v'},
 	{"version",	no_argument,	NULL,	'V'},
 	{"help",	no_argument,	NULL,	'h'},
+	/* hidden */
+	{"dmsg",	no_argument,	NULL,	'd'},
 	{NULL,		no_argument,	NULL,  0}
 };
 
@@ -49,26 +56,41 @@ static void usage(void)
 		"options:\n"
 		"-i | --interactive\n"
 		"-v | --verbose\n"
+		"-V | --version\n"
 		AuVersion "\n", program_invocation_short_name);
 }
 
+#define AuMvDownFin(mvdown, str) do {					\
+		static int e;						\
+		static char a[1024];					\
+		e = errno;						\
+		snprintf(a, sizeof(a), "%s:%d: %s",			\
+			 __FILE__, __LINE__, str);			\
+		errno = e;						\
+		au_errno = (mvdown)->output.au_errno;			\
+		au_perror(a);						\
+		if (errno)						\
+			exit(errno);					\
+	} while (0)
+
 int main(int argc, char *argv[])
 {
-	int err, fd, i, c, interactive;
+	int err, fd, i, c;
+	unsigned int user_flags;
 	struct aufs_mvdown mvdown = {
 		.flags = 0
 	};
 
 	err = 0;
-	interactive = 0;
+	user_flags = 0;
 	i = 0;
 	while ((c = getopt_long(argc, argv, "ivVh", opts, &i)) != -1) {
 		switch (c) {
 		case 'i':
-			interactive = 1;
+			user_flags |= INTERACTIVE;
 			break;
 		case 'v':
-			mvdown.flags |= AUFS_MVDOWN_VERBOSE;
+			user_flags |= VERBOSE;
 			break;
 		case 'V':
 			fprintf(stderr, AuVersion "\n");
@@ -76,6 +98,10 @@ int main(int argc, char *argv[])
 		case 'h':
 			usage();
 			goto out;
+		/* hidden */
+		case 'd':
+			mvdown.flags |= AUFS_MVDOWN_DMSG;
+			break;
 		}
 	}
 
@@ -86,7 +112,7 @@ int main(int argc, char *argv[])
 	}
 
 	for (i = optind; i < argc; i++) {
-		if (interactive) {
+		if (user_flags & INTERACTIVE) {
 			fprintf(stderr, "move down '%s'? ", argv[i]);
 			fflush(stderr);
 			c = fgetc(stdin);
@@ -96,13 +122,16 @@ int main(int argc, char *argv[])
 		}
 		fd = open(argv[i], O_RDONLY);
 		if (fd < 0)
-			AuFin("open");
+			AuMvDownFin(&mvdown, argv[i]);
 		err = ioctl(fd, AUFS_CTL_MVDOWN, &mvdown);
 		if (err)
-			AuFin("AUFS_CTL_MVDOWN");
+			AuMvDownFin(&mvdown, argv[i]);
+		if (user_flags & VERBOSE)
+			printf("'%s' b%d --> b%d\n",
+			       argv[i], mvdown.output.bsrc, mvdown.output.bdst);
 		err = close(fd);
 		if (err)
-			AuFin("open");
+			AuMvDownFin(&mvdown, argv[i]);
 	}
 
 out:
