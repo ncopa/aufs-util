@@ -38,6 +38,7 @@ enum {
 
 static struct option opts[] = {
 	{"interactive",		no_argument,	NULL,	'i'},
+	{"keep-upper",		no_argument,	NULL,	'k'},
 	{"overwrite-lower",	no_argument,	NULL,	'o'},
 	{"verbose",		no_argument,	NULL,	'v'},
 	{"version",		no_argument,	NULL,	'V'},
@@ -56,6 +57,7 @@ static void usage(void)
 		"lower writable branch.\n"
 		"options:\n"
 		"-i | --interactive\n"
+		"-k | --keep-upper\n"
 		"-o | --overwrite-lower\n"
 		"-v | --verbose\n"
 		"-V | --version\n"
@@ -86,10 +88,13 @@ int main(int argc, char *argv[])
 	err = 0;
 	user_flags = 0;
 	i = 0;
-	while ((c = getopt_long(argc, argv, "iovVhd", opts, &i)) != -1) {
+	while ((c = getopt_long(argc, argv, "ikovVhd", opts, &i)) != -1) {
 		switch (c) {
 		case 'i':
 			user_flags |= INTERACTIVE;
+			break;
+		case 'k':
+			mvdown.flags |= AUFS_MVDOWN_KUPPER;
 			break;
 		case 'o':
 			mvdown.flags |= AUFS_MVDOWN_OWLOWER;
