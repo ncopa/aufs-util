@@ -37,13 +37,14 @@ enum {
 };
 
 static struct option opts[] = {
-	{"interactive",	no_argument,	NULL,	'i'},
-	{"verbose",	no_argument,	NULL,	'v'},
-	{"version",	no_argument,	NULL,	'V'},
-	{"help",	no_argument,	NULL,	'h'},
+	{"interactive",		no_argument,	NULL,	'i'},
+	{"overwrite-lower",	no_argument,	NULL,	'o'},
+	{"verbose",		no_argument,	NULL,	'v'},
+	{"version",		no_argument,	NULL,	'V'},
+	{"help",		no_argument,	NULL,	'h'},
 	/* hidden */
-	{"dmsg",	no_argument,	NULL,	'd'},
-	{NULL,		no_argument,	NULL,  0}
+	{"dmsg",		no_argument,	NULL,	'd'},
+	{NULL,			no_argument,	NULL,  0}
 };
 
 static void usage(void)
@@ -55,6 +56,7 @@ static void usage(void)
 		"lower writable branch.\n"
 		"options:\n"
 		"-i | --interactive\n"
+		"-o | --overwrite-lower\n"
 		"-v | --verbose\n"
 		"-V | --version\n"
 		AuVersion "\n", program_invocation_short_name);
@@ -84,10 +86,13 @@ int main(int argc, char *argv[])
 	err = 0;
 	user_flags = 0;
 	i = 0;
-	while ((c = getopt_long(argc, argv, "ivVh", opts, &i)) != -1) {
+	while ((c = getopt_long(argc, argv, "iovVhd", opts, &i)) != -1) {
 		switch (c) {
 		case 'i':
 			user_flags |= INTERACTIVE;
+			break;
+		case 'o':
+			mvdown.flags |= AUFS_MVDOWN_OWLOWER;
 			break;
 		case 'v':
 			user_flags |= VERBOSE;
