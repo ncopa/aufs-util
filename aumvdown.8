@@ -38,8 +38,6 @@ It is obvious that when the file exists between the first and the next
 lower writable branches, or hidden by the whiteout or directory's
 opaque-ness, then the operation will fail. Because it breaks
 the consistency in aufs world.
-
-In this case, EINVAL will be returned.
 .Bu
 If a "opaque"-ed directory exists in the ancestors of the file and it
 would hide the moved-down file, then the operation will fail.
@@ -49,27 +47,17 @@ and destination branch and it would hide  the moved-down file,
 then the operation will fail too.
 Note that the whiteout on "=ro" branch is not in effect, but "=ro+wh"
 branch.
-
-In these cases, EINVAL will be returned.
 .Bu
 Files in use (both in aufs world and in branch filesystem) are not be
 handled.
-
-In this case, EBUSY will be returned.
 .Bu
 Hard-linked files are not be handled.
-
-In this case, EBUSY will be returned.
 For such file, remount aufs or use \fBauplink\fP(8) or\fBaubrsync\fP(8).
 .Bu
 Removed files are not be handled since it has no name.
-
-In this case, ENOENT will be returned.
 .Bu
 Directories are not be handled since the action doesn't behave
 recursively and the moving-down an empty dir has less meaning.
-
-In this case, EDIR will be returned.
 .RE
 
 .\" ----------------------------------------------------------------------
@@ -80,10 +68,16 @@ In this case, EDIR will be returned.
 Prompt to the user for every given file.
 .
 .TP
+.B \-k | \-\-keep-upper
+Don't unlink the upper source file after copying-down.
+.
+.TP
+.B \-o | \-\-overwrite-lower
+Overwrite the lower target file if it exists.
+.
+.TP
 .B \-v | \-\-verbose
 Make it verbose particularly for the error cases.
-Note that some of the messages are printed by kernel and left in your
-syslog file.
 .
 .TP
 .B \-h | \-\-help

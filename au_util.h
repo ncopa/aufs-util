@@ -38,6 +38,11 @@
 #define MTab "/etc/mtab"
 #endif
 
+/* perror.c */
+extern int au_errno;
+extern const char *au_errlist[];
+void au_perror(const char *s);
+
 /* proc_mounts.c */
 struct mntent;
 int au_proc_getmntent(char *mntpnt, struct mntent *rent);

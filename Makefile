@@ -40,12 +40,12 @@ override CPPFLAGS += -DMOUNT_CMD_PATH=\"\"
 endif
 
 Cmd = aubusy auchk aubrsync
-Man = aufs.5
+Man = aufs.5 aumvdown.8
 Etc = etc_default_aufs
 Bin = auibusy aumvdown auplink mount.aufs umount.aufs #auctl
 BinObj = $(addsuffix .o, ${Bin})
 LibUtil = libautil.a
-LibUtilObj = proc_mnt.o br.o plink.o mtab.o
+LibUtilObj = perror.o proc_mnt.o br.o plink.o mtab.o
 LibUtilHdr = au_util.h
 export
 
@@ -100,11 +100,14 @@ install_etc: Tgt = ${DESTDIR}/etc/default/aufs
 install_etc: ${File}
 	install -d $(dir ${Tgt})
 	${Install} -m 644 -T ${File} ${Tgt}
-install_man: File = aufs.5
-install_man: Tgt = ${DESTDIR}/usr/share/man/man5
-install_man: ${File}
+install_man5: File = aufs.5
+install_man5: Tgt = ${DESTDIR}/usr/share/man/man5
+install_man8: File = aumvdown.8
+install_man8: Tgt = ${DESTDIR}/usr/share/man/man8
+install_man5 install_man8: ${File}
 	install -d ${Tgt}
 	${Install} -m 644 ${File} ${Tgt}
+install_man: install_man5 install_man8
 install_ulib:
 	${MAKE} -C libau $@
 
