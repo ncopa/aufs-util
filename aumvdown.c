@@ -40,6 +40,7 @@ static struct option opts[] = {
 	{"interactive",		no_argument,	NULL,	'i'},
 	{"keep-upper",		no_argument,	NULL,	'k'},
 	{"overwrite-lower",	no_argument,	NULL,	'o'},
+	{"allow-ro-lower",	no_argument,	NULL,	'r'},
 	{"verbose",		no_argument,	NULL,	'v'},
 	{"version",		no_argument,	NULL,	'V'},
 	{"help",		no_argument,	NULL,	'h'},
@@ -59,6 +60,7 @@ static void usage(void)
 		"-i | --interactive\n"
 		"-k | --keep-upper\n"
 		"-o | --overwrite-lower\n"
+		"-r | --allow-ro-lower\n"
 		"-v | --verbose\n"
 		"-V | --version\n"
 		AuVersion "\n", program_invocation_short_name);
@@ -71,7 +73,7 @@ static void usage(void)
 		snprintf(a, sizeof(a), "%s:%d: %s",			\
 			 __FILE__, __LINE__, str);			\
 		errno = e;						\
-		au_errno = (mvdown)->output.au_errno;			\
+		au_errno = (mvdown)->au_errno;				\
 		au_perror(a);						\
 		if (errno)						\
 			exit(errno);					\
@@ -88,7 +90,7 @@ int main(int argc, char *argv[])
 	err = 0;
 	user_flags = 0;
 	i = 0;
-	while ((c = getopt_long(argc, argv, "ikovVhd", opts, &i)) != -1) {
+	while ((c = getopt_long(argc, argv, "ikorvVhd", opts, &i)) != -1) {
 		switch (c) {
 		case 'i':
 			user_flags |= INTERACTIVE;
@@ -99,19 +101,25 @@ int main(int argc, char *argv[])
 		case 'o':
 			mvdown.flags |= AUFS_MVDOWN_OWLOWER;
 			break;
+		case 'r':
+			mvdown.flags |= AUFS_MVDOWN_ROLOWER;
+			break;
 		case 'v':
 			user_flags |= VERBOSE;
 			break;
 		case 'V':
 			fprintf(stderr, AuVersion "\n");
 			goto out;
-		case 'h':
-			usage();
-			goto out;
+
 		/* hidden */
 		case 'd':
 			mvdown.flags |= AUFS_MVDOWN_DMSG;
 			break;
+
+		case 'h':
+		default:
+			usage();
+			goto out;
 		}
 	}
 
@@ -136,9 +144,13 @@ int main(int argc, char *argv[])
 		err = ioctl(fd, AUFS_CTL_MVDOWN, &mvdown);
 		if (err)
 			AuMvDownFin(&mvdown, argv[i]);
-		if (user_flags & VERBOSE)
-			printf("'%s' b%d --> b%d\n",
-			       argv[i], mvdown.output.bsrc, mvdown.output.bdst);
+		if (user_flags & VERBOSE) {
+			char *s = "";
+			if (mvdown.flags & AUFS_MVDOWN_ROLOWER_R)
+				s = "(RO)";
+			printf("'%s' b%d --> b%d%s\n",
+			       argv[i], mvdown.bsrc, mvdown.bdst, s);
+		}
 		err = close(fd);
 		if (err)
 			AuMvDownFin(&mvdown, argv[i]);
