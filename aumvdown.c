@@ -41,6 +41,7 @@ static struct option opts[] = {
 	{"keep-upper",		no_argument,	NULL,	'k'},
 	{"overwrite-lower",	no_argument,	NULL,	'o'},
 	{"allow-ro-lower",	no_argument,	NULL,	'r'},
+	{"allow-ro-upper",	no_argument,	NULL,	'R'},
 	{"verbose",		no_argument,	NULL,	'v'},
 	{"version",		no_argument,	NULL,	'V'},
 	{"help",		no_argument,	NULL,	'h'},
@@ -61,6 +62,7 @@ static void usage(void)
 		"-k | --keep-upper\n"
 		"-o | --overwrite-lower\n"
 		"-r | --allow-ro-lower\n"
+		"-R | --allow-ro-upper\n"
 		"-v | --verbose\n"
 		"-V | --version\n"
 		AuVersion "\n", program_invocation_short_name);
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
 	err = 0;
 	user_flags = 0;
 	i = 0;
-	while ((c = getopt_long(argc, argv, "ikorvVhd", opts, &i)) != -1) {
+	while ((c = getopt_long(argc, argv, "ikorRvVhd", opts, &i)) != -1) {
 		switch (c) {
 		case 'i':
 			user_flags |= INTERACTIVE;
@@ -103,6 +105,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'r':
 			mvdown.flags |= AUFS_MVDOWN_ROLOWER;
+			break;
+		case 'R':
+			mvdown.flags |= AUFS_MVDOWN_ROUPPER;
 			break;
 		case 'v':
 			user_flags |= VERBOSE;
@@ -145,11 +150,13 @@ int main(int argc, char *argv[])
 		if (err)
 			AuMvDownFin(&mvdown, argv[i]);
 		if (user_flags & VERBOSE) {
-			char *s = "";
+			char *u = "", *l = "";
 			if (mvdown.flags & AUFS_MVDOWN_ROLOWER_R)
-				s = "(RO)";
-			printf("'%s' b%d --> b%d%s\n",
-			       argv[i], mvdown.bsrc, mvdown.bdst, s);
+				l = "(RO)";
+			if (mvdown.flags & AUFS_MVDOWN_ROUPPER_R)
+				u = "(RO)";
+			printf("'%s' b%d%s --> b%d%s\n",
+			       argv[i], mvdown.bsrc, u, mvdown.bdst, l);
 		}
 		err = close(fd);
 		if (err)

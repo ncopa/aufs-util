@@ -79,7 +79,13 @@ Overwrite the lower target file if it exists.
 .B \-r | \-\-allow\-ro\-lower
 Do the operation even if the lower branch is marked as readonly in aufs
 world ("=ro"). Note that the natively readonly filesystems (mounted with
-"\-o ro") are still ignored even if you specify this option.
+"\-o ro") are not operatable still even if you specify this option.
+.
+.TP
+.B \-R | \-\-allow\-ro\-upper
+Do the operation even if the upper branch is marked as readonly in aufs
+world ("=ro"). Note that the natively readonly filesystems (mounted with
+"\-o ro") are not operatable still even if you specify this option.
 .
 .TP
 .B \-v | \-\-verbose
