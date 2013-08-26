@@ -22,11 +22,13 @@
 #include "au_util.h"
 
 int au_errno;
-const char *au_errlist[] = {
+const char *au_errlist[EAU_Last] = {
 	[EAU_MVDOWN_OPAQUE]	= "Opaque ancestor",
 	[EAU_MVDOWN_WHITEOUT]	= "Whiteout-ed by ancestor",
 	[EAU_MVDOWN_UPPER]	= "Upper exists",
-	[EAU_MVDOWN_BOTTOM]	= "No writable lower"
+	[EAU_MVDOWN_BOTTOM]	= "No writable lower",
+	[EAU_MVDOWN_NOUPPER]	= "No upper exists",
+	[EAU_MVDOWN_NOLOWERBR]	= "No such lower branch"
 };
 
 void au_perror(const char *s)

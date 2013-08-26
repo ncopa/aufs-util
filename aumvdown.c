@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -37,18 +38,32 @@ enum {
 };
 
 static struct option opts[] = {
-	{"interactive",		no_argument,	NULL,	'i'},
-	{"keep-upper",		no_argument,	NULL,	'k'},
-	{"overwrite-lower",	no_argument,	NULL,	'o'},
-	{"allow-ro-lower",	no_argument,	NULL,	'r'},
-	{"allow-ro-upper",	no_argument,	NULL,	'R'},
-	{"verbose",		no_argument,	NULL,	'v'},
-	{"version",		no_argument,	NULL,	'V'},
-	{"help",		no_argument,	NULL,	'h'},
+	{"lower-branch-id",	required_argument,	NULL,	'b'},
+	{"upper-branch-id",	required_argument,	NULL,	'B'},
+	{"interactive",		no_argument,		NULL,	'i'},
+	{"keep-upper",		no_argument,		NULL,	'k'},
+	{"overwrite-lower",	no_argument,		NULL,	'o'},
+	{"allow-ro-lower",	no_argument,		NULL,	'r'},
+	{"allow-ro-upper",	no_argument,		NULL,	'R'},
+	{"verbose",		no_argument,		NULL,	'v'},
+	{"version",		no_argument,		NULL,	'V'},
+	{"help",		no_argument,		NULL,	'h'},
 	/* hidden */
-	{"dmsg",		no_argument,	NULL,	'd'},
-	{NULL,			no_argument,	NULL,  0}
+	{"dmsg",		no_argument,		NULL,	'd'},
+	{NULL,			no_argument,		NULL,  0}
 };
+
+static long cvt(char *str)
+{
+	long ret;
+
+	errno = 0;
+	ret = strtol(str, NULL, 10);
+	if ((ret == LONG_MAX || ret == LONG_MIN)
+	    && errno)
+		ret = -1;
+	return ret;
+}
 
 static void usage(void)
 {
@@ -58,6 +73,8 @@ static void usage(void)
 		"from the highest branch where the file exist to the next\n"
 		"lower writable branch.\n"
 		"options:\n"
+		"-b | --lower-branch-id brid\n"
+		"-B | --upper-branch-id brid\n"
 		"-i | --interactive\n"
 		"-k | --keep-upper\n"
 		"-o | --overwrite-lower\n"
@@ -92,8 +109,26 @@ int main(int argc, char *argv[])
 	err = 0;
 	user_flags = 0;
 	i = 0;
-	while ((c = getopt_long(argc, argv, "ikorRvVhd", opts, &i)) != -1) {
+	while ((c = getopt_long(argc, argv, "b:B:ikorRvVhd", opts, &i)) != -1) {
 		switch (c) {
+		case 'b':
+			err = cvt(optarg);
+			if (err < 0) {
+				perror(optarg);
+				goto out;
+			}
+			mvdown.flags |= AUFS_MVDOWN_BRID_LOWER;
+			mvdown.a[AUFS_MVDOWN_LOWER].brid = err;
+			break;
+		case 'B':
+			err = cvt(optarg);
+			if (err < 0) {
+				perror(optarg);
+				goto out;
+			}
+			mvdown.flags |= AUFS_MVDOWN_BRID_UPPER;
+			mvdown.a[AUFS_MVDOWN_UPPER].brid = err;
+			break;
 		case 'i':
 			user_flags |= INTERACTIVE;
 			break;
@@ -155,8 +190,14 @@ int main(int argc, char *argv[])
 				l = "(RO)";
 			if (mvdown.flags & AUFS_MVDOWN_ROUPPER_R)
 				u = "(RO)";
-			printf("'%s' b%d%s --> b%d%s\n",
-			       argv[i], mvdown.bsrc, u, mvdown.bdst, l);
+			printf("'%s' b%d(brid%d)%s --> b%d(brid%d)%s\n",
+			       argv[i],
+			       mvdown.a[AUFS_MVDOWN_UPPER].bindex,
+			       mvdown.a[AUFS_MVDOWN_UPPER].brid,
+			       u,
+			       mvdown.a[AUFS_MVDOWN_LOWER].bindex,
+			       mvdown.a[AUFS_MVDOWN_LOWER].brid,
+			       l);
 		}
 		err = close(fd);
 		if (err)
