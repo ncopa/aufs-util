@@ -1438,6 +1438,13 @@ the `mfs' mode.
 Selects a writable branch where the parent dir exists, such as tdp
 mode. When the parent dir exists on multiple writable branches, aufs
 selects the one which has most free space, such as mfs mode.
+.
+.TP
+.B create=pmfsrr:low[:second]
+Firstly selects a writable branch as the `pmfs mode.'
+If there are less than `low' bytes available on all branches where the
+parent dir exists, aufs selects the one which has the most free space
+regardless the parent dir.
 
 .SS Policies for Copy-Up
 .

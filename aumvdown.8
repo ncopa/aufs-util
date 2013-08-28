@@ -52,7 +52,7 @@ Files in use (both in aufs world and in branch filesystem) are not be
 handled.
 .Bu
 Hard-linked files are not be handled.
-For such file, remount aufs or use \fBauplink\fP(8) or\fBaubrsync\fP(8).
+For such file, remount aufs or use \fBauplink\fP(8) or \fBaubrsync\fP(8).
 .Bu
 Removed files are not be handled since it has no name.
 .Bu
@@ -64,16 +64,34 @@ recursively and the moving-down an empty dir has less meaning.
 .SH OPTIONS
 .
 .TP
+.B \-b | \-\-lower\-branch\-id
+.B \-B | \-\-upper\-branch\-id
+Specify the source/target branch by its id.
+You can obtain the branch id via sysfs.
+.
+.TP
 .B \-i | \-\-interactive
 Prompt to the user for every given file.
 .
 .TP
-.B \-k | \-\-keep-upper
+.B \-k | \-\-keep\-upper
 Don't unlink the upper source file after copying-down.
 .
 .TP
-.B \-o | \-\-overwrite-lower
+.B \-o | \-\-overwrite\-lower
 Overwrite the lower target file if it exists.
+.
+.TP
+.B \-r | \-\-allow\-ro\-lower
+Do the operation even if the lower branch is marked as readonly in aufs
+world ("=ro"). Note that the natively readonly filesystems (mounted with
+"\-o ro") are not operatable still even if you specify this option.
+.
+.TP
+.B \-R | \-\-allow\-ro\-upper
+Do the operation even if the upper branch is marked as readonly in aufs
+world ("=ro"). Note that the natively readonly filesystems (mounted with
+"\-o ro") are not operatable still even if you specify this option.
 .
 .TP
 .B \-v | \-\-verbose
