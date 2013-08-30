@@ -40,7 +40,7 @@ override CPPFLAGS += -DMOUNT_CMD_PATH=\"\"
 endif
 
 Cmd = aubusy auchk aubrsync
-Man = aufs.5 aumvdown.8
+Man = aufs.5
 Etc = etc_default_aufs
 Bin = auibusy aumvdown auplink mount.aufs umount.aufs #auctl
 BinObj = $(addsuffix .o, ${Bin})
