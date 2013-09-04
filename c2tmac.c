@@ -30,8 +30,6 @@ main(int argc, char *argv[])
 	pstr(AUFS_VERSION);
 	pstr(AUFS_XINO_FNAME);
 	pstr(AUFS_XINO_DEFPATH);
-	pint(AUFS_XINO_TRUNC_INIT);
-	pint(AUFS_XINO_TRUNC_STEP);
 	pint(AUFS_DIRWH_DEF);
 	pstr(AUFS_WH_PFX);
 	pint(AUFS_WH_PFX_LEN);
