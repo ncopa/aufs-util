@@ -35,6 +35,6 @@ int main(int argc, char *argv[])
 
 	puts("Wrong version!\n"
 	     AuVersion ", but aufs is " AUFS_VERSION ".\n"
-	     "See README in detail and try git branch -a.\n");
+	     "See README in detail and try git branch -a.");
 	return -1;
 }
