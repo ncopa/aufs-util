@@ -1261,6 +1261,20 @@ Just simply run your application.
 The dynamic link library libau.so implements
 another readdir routine, and all readdir(3) calls in your application
 will be handled by libau.so.
+For setting environment variables, you may want to use a shell funtion
+or alias such like this.
+
+.nf
+$ auls()
+> {
+>	LD_PRELOAD=/your/path/to/libau.so
+>	\*[LibAuEnv]=all
+>	#AUFS_RDU_BLK= set if you want
+>	ls $@
+> }
+
+$ alias auls="LD_PRELOAD=/your/path/to/libau.so \*[LibAuEnv]=all ls"
+.fi
 
 When you call readdir(3), the dynamic linker calls readdir in libau.so.
 If it finds the passed dir is NOT aufs, it calls the usual readdir(3).
