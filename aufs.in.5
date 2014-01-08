@@ -1799,6 +1799,44 @@ support EXDEV, it will not work on aufs.
 Also this specification is applied to the case when the src directory
 exists on the lower readonly branch and it has child(ren).
 
+While it is rare, users can open a removed file with a little help
+from procfs.
+
+.RS
+.Bu
+open a file and get its descriptor
+.Bu
+remove the file
+.Bu
+generate a string `/proc/PID/fd/N'
+.Bu
+open the same file using the generated string
+.Bu
+.RE
+
+This operation is a little difficult for aufs since aufs allows the
+direct access to branches (by-passing aufs), and it is hard to
+distinguish the case of this.
+
+.RS
+.Bu
+remove a file on a branch directly (by-passing aufs)
+.Bu
+open the file via aufs
+.RE
+
+For the latter case, aufs detects the unmatching status between aufs
+cached info and the real info from the branch, and tries refreshing by
+re-lookup. Finally aufs finds
+the file is removed and let open(2) return an error.
+For the former case, currently (linux-3.13-rc7), aufs simply follows the
+behaviour of ext2 which supports for opening a non-direcotry but returns
+an error for a directory.
+Other than open(2), users may chmod(2) and chown(2) similary (remove the
+file and then operate it via procfs). Ext2 supports them too, but aufs
+doesn't. I don't think it a big disadvantage since users can fchmod(2)
+and fchown(2) instead.
+
 If a sudden accident such like a power failure happens during aufs is
 performing, and regular fsck for branch filesystems is completed after
 the disaster, you need to extra fsck for aufs writable branches. It is
