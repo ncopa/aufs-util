@@ -27,9 +27,9 @@ test $# -ne 2 &&
 {
 	echo Invalid argument
 	echo Usage: $(basename $0) '[-v]' aufs_mntpnt branch_path
-	echo '\tprint PIDs which make the branch busy and un-removable.'
-	echo '\t-v prints additional information, the inode number in aufs,'
-	echo '\tthe branch index, and the actual inode number on that branch.'
+	printf '\tprint PIDs which make the branch busy and un-removable.\n'
+	printf '\t-v prints additional information, the inode number in aufs,\n'
+	printf '\tthe branch index, and the actual inode number on that branch.\n'
 } 1>&2 &&
 exit 1
 
