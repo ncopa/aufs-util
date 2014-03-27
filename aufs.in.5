@@ -1416,9 +1416,9 @@ policy.
 .
 .TP
 .B create=tdp | top\-down\-parent
-Selects the highest writable branch where the parent dir exists. If
-the parent dir does not exist on a writable branch, then the internal
-copyup will happen. The policy for this copyup is always `bottom-up.'
+Select the highest branch where the parent dir exists. If this
+branch is not writable, internal copyup will happen.
+The policy for this copyup is always `bottom-up.'
 This is the default policy.
 .
 .TP
