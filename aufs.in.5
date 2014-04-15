@@ -1135,6 +1135,8 @@ IN_DELETE event. It depends upon the status of dentry
 (DCACHE_NFSFS_RENAMED flag).
 In this case, the file on aufs seems still exists. Aufs and any user can see
 the file.
+Since linux-3.15-rc1, this behaviour has been changed and NFS fires the
+event from itself.
 
 .SS IN_IGNORED, deleted rename target
 When a file/dir on a branch is unlinked by rename(2) directly, inotify
