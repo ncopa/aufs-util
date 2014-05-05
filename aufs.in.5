@@ -1776,6 +1776,13 @@ and lockf(3), is applied to virtual aufs file only, not to the file on a
 branch. It means you can break the lock by accessing a branch directly.
 TODO: check `security' to hook locks, as inotify does.
 
+Aufs repects all "security" hooks in kernel, so you can configure LSM
+for both of virtual aufs files and real branch-fs files. But there is
+one exception, it is the kernel function "security_mmap_file()." The
+function called inside aufs for a branch-fs file may cause a deadlock,
+so aufs stops calling it.
+LSM settings for the virtual aufs files works as usual.
+
 The I/O to the named pipe or local socket are not handled by aufs, even
 if it exists in aufs. After the reader and the writer established their
 connection if the pipe/socket are copied-up, they keep using the old one
