@@ -435,6 +435,20 @@ But I don't think users want to rename branches so often.
 If CONFIG_SYSFS is disable, this parameter is always set to 0.
 .
 .TP
+.B allow_userns= Y | N
+Allows an unprivileged mount under user namespace.
+Userns mount to put AUFS into a chroot environment can be useful
+while it as a security worry. This parameter sets an internal flag
+FS_USERNS_MOUNT and allows userns unconditionally.
+
+See the discussion in
+http://www.mail-archive.com/aufs-users@lists.sourceforge.net/msg04266.html
+and its thread.
+
+The default is `N'.
+If CONFIG_USER_NS is disabled, this parameter is meaningless.
+.
+.TP
 .B sysrq=key
 Specifies MagicSysRq key for debugging aufs.
 You need to enable both of CONFIG_MAGIC_SYSRQ and CONFIG_AUFS_DEBUG.
