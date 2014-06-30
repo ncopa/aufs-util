@@ -435,6 +435,20 @@ But I don't think users want to rename branches so often.
 If CONFIG_SYSFS is disable, this parameter is always set to 0.
 .
 .TP
+.B allow_userns= Y | N
+Allows an unprivileged mount under user namespace.
+Userns mount to put AUFS into a chroot environment can be useful
+while it as a security worry. This parameter sets an internal flag
+FS_USERNS_MOUNT and allows userns unconditionally.
+
+See the discussion in
+http://www.mail-archive.com/aufs-users@lists.sourceforge.net/msg04266.html
+and its thread.
+
+The default is `N'.
+If CONFIG_USER_NS is disabled, this parameter is meaningless.
+.
+.TP
 .B sysrq=key
 Specifies MagicSysRq key for debugging aufs.
 You need to enable both of CONFIG_MAGIC_SYSRQ and CONFIG_AUFS_DEBUG.
@@ -570,6 +584,29 @@ this attribute is implemented. If you specify `unpin' as a branch
 attribute, it stops behaving as a mount\-point and you can rename the
 branch top dir.
 Needless to say, if you remove the branch top dir, then aufs cannot work.
+.
+.TP
+.B coo_reg | coo_all
+Copy\-up on open.
+These attributes are for not only the readonly branches but
+also the writable branches. `coo_reg' handles the regular files only and
+`coo_all' handles the regular files plus the directories. All special
+files and symlinks will not be copied-up.
+Additionally NFS server may not issue open(2) when NFS client issues
+open(2) when the file size is zero. This behaviour means that the
+zero-sized file may not be copied-up when NFS client issues open(2).
+
+The internal copy\-up operataion by these attributes are unrelated to
+the COPYUP_POLICY
+(cf. Policies to Select One among Multiple Writable Branches),
+which means `copy\-up on open' always choose the nearest upper writable
+branch.
+Even if there are multiple writable branches set these attributes,
+the internal copy\-up operation is done once, not recursively.
+
+The `copy\-up on open' itself may not be so attractive, but combining
+with a future feature FHSM (File-based Hierarchy Storage Management)
+will be useful.
 
 .\" .SS FUSE as a branch
 .\" A FUSE branch needs special attention.
