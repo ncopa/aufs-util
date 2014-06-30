@@ -614,6 +614,21 @@ contains such files only may improve the performance of aufs.
 The `copy\-up on open' itself may not be so attractive, but combining
 with a future feature FHSM (File\-based Hierarchy Storage Management)
 will be useful.
+.
+.TP
+.B moo
+Move\-up on open.
+Very similar attribute to coo except moo unlinks the copy\-up source
+after the successful operation. This attribute handles the regular files
+only, and obviously cannot be specified to the readonly branch.
+
+Users can specify all these attributes for a single writable branch, but
+only the last specifed one has its effect. Other coo/moo attributes are
+silently ignored.
+
+The `move\-up on open' itself may not be so attractive, but combining
+with a future feature FHSM (File\-based Hierarchy Storage Management)
+will be useful.
 
 .\" .SS FUSE as a branch
 .\" A FUSE branch needs special attention.
