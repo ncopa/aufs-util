@@ -403,6 +403,24 @@ with keeping its feature to hide the lowers.
 Honestly speaking, I am rather confused with this `visible whiteouts.'
 But a user who originally requested this feature wrote a nice how\-to
 document about this feature. See Tips file in the aufs CVS tree.
+.
+.TP
+.B dirperm1
+.TQ
+.B nodirperm1
+By default (nodirperm1), aufs repects the directory permission bits on
+all branches equally, which means if the permission bits for a directory
+on a lower readonly branch prohibits you to read, then you cannot read
+even if you run "chmod a+rx" (and aufs copies it up).
+With this option (dirperm1), the behaviour changes and aufs checks the
+permission bits of the directory on the topmost branch and the
+permission bits on all lower branches are ignored.
+In other words, you read a directory even if the lower readonly branch
+fs prohibits it by its permission bits.
+
+This feature may invite a security risk similar to the world writable
+upper branch. As this case, dirperm1 option will produce a warning too.
+
 
 .\" ----------------------------------------------------------------------
 .SH Module Parameters
