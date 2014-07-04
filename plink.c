@@ -237,7 +237,7 @@ static void au_plink_maint(char *si, int close_on_exec, int *fd)
 
 void au_clean_plink(void)
 {
-	ssize_t ssz;
+	ssize_t ssz __attribute__((unused));
 
 	ssz = write(proc_fd, "clean", 5);
 #ifndef DEBUG
