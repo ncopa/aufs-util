@@ -123,7 +123,7 @@ struct Rdu_DIRENT *(*Rdu_REAL_READDIR)(DIR *dir);
 struct Rdu_DIRENT *Rdu_READDIR(DIR *dir)
 {
 	struct Rdu_DIRENT *de;
-	int err;
+	int err __attribute__((unused));
 
 	if (LibAuTestFunc(Rdu_READDIR)) {
 		err = rdu_readdir(dir, NULL, &de);

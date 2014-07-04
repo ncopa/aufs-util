@@ -37,7 +37,7 @@ enum {
 	VERBOSE		= (1 << 1),
 };
 
-static struct option opts[] = {
+static struct option opts[] __attribute__((unused)) = {
 	{"lower-branch-id",	required_argument,	NULL,	'b'},
 	{"upper-branch-id",	required_argument,	NULL,	'B'},
 	{"interactive",		no_argument,		NULL,	'i'},
@@ -53,7 +53,7 @@ static struct option opts[] = {
 	{NULL,			no_argument,		NULL,  0}
 };
 
-static long cvt(char *str)
+static __attribute__((unused)) long cvt(char *str)
 {
 	long ret;
 
@@ -65,7 +65,7 @@ static long cvt(char *str)
 	return ret;
 }
 
-static void usage(void)
+static __attribute__((unused)) void usage(void)
 {
 	fprintf(stderr,
 		"usage: %s [options] file ...\n"
