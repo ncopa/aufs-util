@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2013 Junjiro R. Okajima
+ * Copyright (C) 2011-2014 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,17 +53,7 @@ static struct option opts[] __attribute__((unused)) = {
 	{NULL,			no_argument,		NULL,  0}
 };
 
-static __attribute__((unused)) long cvt(char *str)
-{
-	long ret;
-
-	errno = 0;
-	ret = strtol(str, NULL, 10);
-	if ((ret == LONG_MAX || ret == LONG_MIN)
-	    && errno)
-		ret = -1;
-	return ret;
-}
+#define OPTS_FORM	"b:B:ikorRvVh" "d"
 
 static __attribute__((unused)) void usage(void)
 {
@@ -83,6 +73,18 @@ static __attribute__((unused)) void usage(void)
 		"-v | --verbose\n"
 		"-V | --version\n"
 		AuVersion "\n", program_invocation_short_name);
+}
+
+static __attribute__((unused)) long cvt(char *str)
+{
+	long ret;
+
+	errno = 0;
+	ret = strtol(str, NULL, 10);
+	if ((ret == LONG_MAX || ret == LONG_MIN)
+	    && errno)
+		ret = -1;
+	return ret;
 }
 
 #define AuMvDownFin(mvdown, str) do {					\
@@ -109,7 +111,7 @@ int main(int argc, char *argv[])
 	err = 0;
 	user_flags = 0;
 	i = 0;
-	while ((c = getopt_long(argc, argv, "b:B:ikorRvVhd", opts, &i)) != -1) {
+	while ((c = getopt_long(argc, argv, OPTS_FORM, opts, &i)) != -1) {
 		switch (c) {
 		case 'b':
 			err = cvt(optarg);
