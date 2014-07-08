@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2013 Junjiro R. Okajima
+ * Copyright (C) 2011-2014 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,20 +50,11 @@ static struct option opts[] __attribute__((unused)) = {
 	{"help",		no_argument,		NULL,	'h'},
 	/* hidden */
 	{"dmsg",		no_argument,		NULL,	'd'},
+	{"stfs",		no_argument,		NULL,	's'},
 	{NULL,			no_argument,		NULL,  0}
 };
 
-static __attribute__((unused)) long cvt(char *str)
-{
-	long ret;
-
-	errno = 0;
-	ret = strtol(str, NULL, 10);
-	if ((ret == LONG_MAX || ret == LONG_MIN)
-	    && errno)
-		ret = -1;
-	return ret;
-}
+#define OPTS_FORM	"b:B:ikorRvVh" "ds"
 
 static __attribute__((unused)) void usage(void)
 {
@@ -83,6 +74,30 @@ static __attribute__((unused)) void usage(void)
 		"-v | --verbose\n"
 		"-V | --version\n"
 		AuVersion "\n", program_invocation_short_name);
+}
+
+static __attribute__((unused)) long cvt(char *str)
+{
+	long ret;
+
+	errno = 0;
+	ret = strtol(str, NULL, 10);
+	if ((ret == LONG_MAX || ret == LONG_MIN)
+	    && errno)
+		ret = -1;
+	return ret;
+}
+
+static __attribute__((unused)) void pr_stbr(struct aufs_stbr *stbr)
+{
+	printf("b%d %d%%(%llu/%llu), %d%%(%llu/%llu) free\n",
+	       stbr->bindex,
+	       (int)(stbr->stfs.f_bavail * 100.0 / stbr->stfs.f_blocks),
+	       (unsigned long long)stbr->stfs.f_bavail,
+	       (unsigned long long)stbr->stfs.f_blocks,
+	       (int)(stbr->stfs.f_ffree * 100.0 / stbr->stfs.f_files),
+	       (unsigned long long)stbr->stfs.f_ffree,
+	       (unsigned long long)stbr->stfs.f_files);
 }
 
 #define AuMvDownFin(mvdown, str) do {					\
@@ -109,7 +124,7 @@ int main(int argc, char *argv[])
 	err = 0;
 	user_flags = 0;
 	i = 0;
-	while ((c = getopt_long(argc, argv, "b:B:ikorRvVhd", opts, &i)) != -1) {
+	while ((c = getopt_long(argc, argv, OPTS_FORM, opts, &i)) != -1) {
 		switch (c) {
 		case 'b':
 			err = cvt(optarg);
@@ -118,7 +133,7 @@ int main(int argc, char *argv[])
 				goto out;
 			}
 			mvdown.flags |= AUFS_MVDOWN_BRID_LOWER;
-			mvdown.a[AUFS_MVDOWN_LOWER].brid = err;
+			mvdown.stbr[AUFS_MVDOWN_LOWER].brid = err;
 			break;
 		case 'B':
 			err = cvt(optarg);
@@ -127,7 +142,7 @@ int main(int argc, char *argv[])
 				goto out;
 			}
 			mvdown.flags |= AUFS_MVDOWN_BRID_UPPER;
-			mvdown.a[AUFS_MVDOWN_UPPER].brid = err;
+			mvdown.stbr[AUFS_MVDOWN_UPPER].brid = err;
 			break;
 		case 'i':
 			user_flags |= INTERACTIVE;
@@ -154,6 +169,9 @@ int main(int argc, char *argv[])
 		/* hidden */
 		case 'd':
 			mvdown.flags |= AUFS_MVDOWN_DMSG;
+			break;
+		case 's':
+			mvdown.flags |= AUFS_MVDOWN_STFS;
 			break;
 
 		case 'h':
@@ -192,12 +210,21 @@ int main(int argc, char *argv[])
 				u = "(RO)";
 			printf("'%s' b%d(brid%d)%s --> b%d(brid%d)%s\n",
 			       argv[i],
-			       mvdown.a[AUFS_MVDOWN_UPPER].bindex,
-			       mvdown.a[AUFS_MVDOWN_UPPER].brid,
+			       mvdown.stbr[AUFS_MVDOWN_UPPER].bindex,
+			       mvdown.stbr[AUFS_MVDOWN_UPPER].brid,
 			       u,
-			       mvdown.a[AUFS_MVDOWN_LOWER].bindex,
-			       mvdown.a[AUFS_MVDOWN_LOWER].brid,
+			       mvdown.stbr[AUFS_MVDOWN_LOWER].bindex,
+			       mvdown.stbr[AUFS_MVDOWN_LOWER].brid,
 			       l);
+			if (mvdown.flags & AUFS_MVDOWN_STFS) {
+				if (!(mvdown.flags & AUFS_MVDOWN_STFS_FAILED)) {
+					pr_stbr(mvdown.stbr + AUFS_MVDOWN_UPPER);
+					pr_stbr(mvdown.stbr + AUFS_MVDOWN_LOWER);
+				} else {
+					fprintf(stderr, "STFS failed, ignored\n");
+					fflush(stderr);
+				}
+			}
 		}
 		err = close(fd);
 		if (err)
