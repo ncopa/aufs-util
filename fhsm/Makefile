@@ -19,13 +19,24 @@ UsrLib = aufhsm-list
 Man5 = aufs_fhsm.5
 Man8 = ${UsrLib}.8
 Man = ${Man5} ${Man8}
+LibFhsm = libfhsm.a
+LibFhsmObj = list.o log.o shm.o
+LibFhsmHdr = comm.h log.h
+Tgt = ${LibFhsm}
 
-all:
+all: ${Tgt}
 
 clean:
-	${RM} *~
+	${RM} ${Tgt} ${LibFhsmObj} *~
 
 install: install_ulib install_man
+
+########################################
+
+override CPPFLAGS += -DAUFHSM_LIST_CMD=\"/usr/lib/aufhsm-list\"
+${LibFhsmObj}: %.o: %.c ${LibFhsmHdr}
+${LibFhsm}: $(foreach o, ${LibFhsmObj}, ${LibFhsm}(${o}))
+.NOTPARALLEL: ${LibFhsm}
 
 ########################################
 
@@ -42,3 +53,5 @@ install_man5 install_man8: ${File}
 	${INSTALL} -d ${Tgt}
 	${Install} -m 644 ${File} ${Tgt}
 install_man: install_man5 install_man8
+
+-include priv.mk
