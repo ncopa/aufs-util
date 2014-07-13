@@ -15,34 +15,44 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
+UsrBin = aufhsm
 UsrLib = aufhsm-list
 Man5 = aufs_fhsm.5
-Man8 = ${UsrLib}.8
+Man8 = $(addsuffix .8, ${UsrBin} ${UsrLib})
 Man = ${Man5} ${Man8}
 LibFhsm = libfhsm.a
 LibFhsmObj = fhsm.o list.o log.o msg.o shm.o
 LibFhsmHdr = comm.h log.h
-Tgt = ${LibFhsm}
+Tgt = ${UsrBin}
+TgtObj = $(addsuffix .o, ${Tgt})
 
 all: ${Tgt}
 
 clean:
-	${RM} ${Tgt} ${LibFhsmObj} *~
+	${RM} ${Tgt} ${TgtObj} ${LibFhsm} ${LibFhsmObj} *~
 
-install: install_ulib install_man
+install: install_ubin install_ulib install_man
 
 ########################################
 
 override CPPFLAGS += -DAUFHSM_LIST_CMD=\"/usr/lib/aufhsm-list\"
+override CPPFLAGS += -DAUFHSMD_CMD=\"/usr/lib/aufhsmd\"
 ${LibFhsmObj}: %.o: %.c ${LibFhsmHdr} $(addprefix ../, ${LibUtilHdr})
 ${LibFhsm}: $(foreach o, ${LibFhsmObj}, ${LibFhsm}(${o}))
 .NOTPARALLEL: ${LibFhsm}
 
+${TgtObj}: %.o: %.c ${LibFhsmHdr} $(addprefix ../, ${LibUtilHdr}) ${LibFhsm}
+#${Tgt}: override LDFLAGS += -static
+${Tgt}: override LDFLAGS += -s
+${Tgt}: override LDLIBS += -lrt -L. -lfhsm -L.. -lautil
+
 ########################################
 
+install_ubin: File = ${UsrBin}
+install_ubin: Tgt = ${DESTDIR}/usr/bin
 install_ulib: File = ${UsrLib}
 install_ulib: Tgt = ${DESTDIR}/usr/lib
-install_ulib: ${File}
+install_ubin install_ulib: ${File}
 	${INSTALL} -d ${Tgt}
 	${Install} -m 755 ${File} ${Tgt}
 install_man5: File = ${Man5}

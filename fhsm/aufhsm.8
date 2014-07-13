@@ -1,0 +1,87 @@
+.\" .so aufhsm-inc.8
+.\" .so an-ext.tmac
+.\" see groff_man(7)
+
+.TH aufhsm 8 Linux "Linux Aufs User's Manual"
+.SH NAME
+aufhsm \- File-based Hierarchical Storage Management (FHSM) in AUFS, the
+controller
+
+.\" ----------------------------------------------------------------------
+.SH SYNOPSIS
+.SY aufhsm
+.RI [ option ]
+.RI AufsMountPoint
+.RI [ BranchPath=UPPER\-LOWER
+.IR .\|.\|. ]
+.YS
+
+.\" ----------------------------------------------------------------------
+.SH DESCRIPTION
+Set the watermarks for AUFS FHSM and control the daemon for it.
+
+The mount/umount helper invokes this command internally to
+control the daemon. So users don't have to invoke it generally. But
+users may want to use this command to set the watermarks.
+
+.\" ----------------------------------------------------------------------
+.SH OPTIONS
+.TP
+\-i, \-\-inode
+.B
+BranchPath=UPPER\-LOWER
+parameter represents the value for the number of inodes instead of blocks.
+.
+.TP
+\-d DIR, \-\-dir DIR
+use DIR to store the aufhsm file-list
+.
+.TP
+\-r, \-\-recreate
+Unlink the existing internal files and newly re-create them.
+.
+.TP
+\-k, \-\-kill
+Terminates the daemon (aufhsmd(8)).
+.
+.TP
+\-q, \-\-quiet
+Does not print the current watermarks.
+.\" .
+.\" .TP
+.\" \-v, \-\-verbose
+.\" .
+.\" .TP
+.\" \-V, \-\-version
+.
+.TP
+\-h, \-\-help
+
+.\" ----------------------------------------------------------------------
+.\" .SH ERRORS
+.\" ----------------------------------------------------------------------
+.SH ENVIRONMENT
+.TP
+AUFHSM_LIST_DIR
+Has the same effect of \-d option. When both are give, only \-d option
+has its effect.
+
+.\" ----------------------------------------------------------------------
+.\" .SH NOTES
+.\" ----------------------------------------------------------------------
+.\" .SH BUGS
+.\" ----------------------------------------------------------------------
+.SH EXAMPLE
+.\" ----------------------------------------------------------------------
+.SH SEE ALSO
+.BR aufs_fhsm (5),
+.BR aufhsmd (8),
+.BR aufhsm-list (8),
+.BR aumvdown (8),
+.BR aufs (5)
+
+.SH COPYRIGHT
+Copyright \(co 2011-2014 Junjiro R. Okajima
+
+.SH AUTHOR
+Junjiro R. Okajima
