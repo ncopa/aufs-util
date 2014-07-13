@@ -23,10 +23,11 @@
 
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/statfs.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <string.h>
 #include <unistd.h>
+#include <linux/aufs_type.h>
 
 #include "comm.h"
 #include "log.h"
@@ -107,4 +108,119 @@ char *au_shm_dir(int fd)
 
 out:
 	return dir;
+}
+
+/* ---------------------------------------------------------------------- */
+
+/*
+ * open and lock.
+ * to unlock, just close(2).
+ */
+static_unless_ut
+int au_shm_open(char *name, int oflags, mode_t mode)
+{
+	int fd, err;
+	struct statfs stfs;
+	struct flock fl = {
+		.l_type		= F_RDLCK,
+		.l_whence	= SEEK_SET,
+		.l_start	= 0,
+		.l_len		= 0 // the whole file
+	};
+
+	fd = shm_open(name, oflags, mode);
+	if (fd < 0) {
+		/* keep this errno */
+		if (errno != EEXIST)
+			AuLogErr("%s", name);
+		goto out;
+	}
+	if (oflags & (O_WRONLY | O_RDWR))
+		fl.l_type = F_WRLCK;
+	err = fcntl(fd, F_SETLKW, &fl);
+	if (err) {
+		AuLogErr("F_SETLKW");
+		goto out_fd;
+	}
+	err = fstatfs(fd, &stfs);
+	if (!err) {
+		if (stfs.f_type == AUFS_SUPER_MAGIC)
+			AuLogWarn1("%s should not be aufs (not an error)\n",
+				   name);
+		goto out; /* success */
+	}
+	AuLogErr("%s", name);
+
+out_fd:
+	if (close(fd))
+		AuLogErr("%s", name);
+	fd = -1;
+out:
+	return fd;
+}
+
+/* create, lock, and mmap */
+int au_shm_create(char *name, off_t len, int *rfd, void *_p)
+{
+	int err, e;
+	void **p = _p;
+
+	*rfd = au_shm_open(name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+	err = *rfd;
+	if (*rfd < 0)
+		/* keep this errno */
+		goto out;
+	err = ftruncate(*rfd, len);
+	if (err) {
+		e = errno;
+		AuLogErr("%s", name);
+		goto out_fd;
+	}
+	/* todo: alignment? */
+	*p = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, *rfd, 0);
+	if (*p != MAP_FAILED)
+		goto out; /* success */
+	err = -1;
+	e = errno;
+	AuLogErr("%s", name);
+
+out_fd:
+	if (close(*rfd))
+		AuLogErr("%s", name);
+	if (shm_unlink(name))
+		AuLogErr("%s", name);
+	errno = e;
+out:
+	return err;
+}
+
+/* open, lock, and mmap */
+int au_shm_map(char *name, int *rfd, void *_p)
+{
+	int err;
+	struct stat st;
+	void **p = _p;
+
+	*rfd = au_shm_open(name, O_RDWR, S_IRUSR | S_IWUSR);
+	err = *rfd;
+	if (*rfd < 0)
+		goto out;
+	err = fstat(*rfd, &st);
+	if (err) {
+		AuLogErr("%s", name);
+		goto out_fd;
+	}
+	*p = mmap(NULL, st.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, *rfd,
+		  0);
+	if (*p != MAP_FAILED)
+		goto out; /* success */
+
+	err = -1;
+	AuLogErr("%s", name);
+
+out_fd:
+	if (close(*rfd))
+		AuLogErr("%s", name);
+out:
+	return err;
 }

@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <linux/aufs_type.h>
@@ -60,3 +61,45 @@ int au_br(union aufs_brinfo **brinfo, int *nbr, char *root)
 
 	return 0;
 }
+
+#ifdef AUFHSM
+int au_nfhsm(int nbr, union aufs_brinfo *brinfo)
+{
+	int nfhsm, i;
+
+	nfhsm = 0;
+	for (i = 0; i < nbr; i++)
+		if (au_br_fhsm(brinfo[i].perm))
+			nfhsm++;
+
+	return nfhsm;
+}
+
+int au_br_qsort_path(const void *_a, const void *_b)
+{
+	const union aufs_brinfo *a = _a, *b = _b;
+
+	return strcmp(a->path, b->path);
+}
+
+void au_br_sort_path(int nbr, union aufs_brinfo *brinfo)
+{
+	qsort(brinfo, nbr, sizeof(*brinfo), au_br_qsort_path);
+}
+
+int au_br_bsearch_path(const void *_path, const void *_brinfo)
+{
+	char *path = (char *)_path;
+	const union aufs_brinfo *brinfo = _brinfo;
+
+	return strcmp(path, brinfo->path);
+}
+
+union aufs_brinfo *au_br_search_path(char *path, int nbr,
+				     union aufs_brinfo *brinfo)
+{
+	return bsearch((void *)path, brinfo, nbr, sizeof(*brinfo),
+		       au_br_bsearch_path);
+}
+
+#endif
