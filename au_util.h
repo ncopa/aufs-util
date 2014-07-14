@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Junjiro R. Okajima
+ * Copyright (C) 2005-2014 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,8 @@ struct mntent;
 int au_proc_getmntent(char *mntpnt, struct mntent *rent);
 
 /* br.c */
-int au_br(char ***br, int *nbr, struct mntent *ent);
+union aufs_brinfo;
+int au_br(union aufs_brinfo **brinfo, int *nbr, char *root);
 
 /* plink.c */
 enum {
