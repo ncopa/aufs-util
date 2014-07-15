@@ -16,14 +16,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
 UsrBin = aufhsm
-UsrLib = aufhsm-list
+UsrLib = aufhsm-list aufhsmd
 Man5 = aufs_fhsm.5
 Man8 = $(addsuffix .8, ${UsrBin} ${UsrLib})
 Man = ${Man5} ${Man8}
 LibFhsm = libfhsm.a
 LibFhsmObj = event.o fhsm.o list.o log.o msg.o mvdown.o shm.o
 LibFhsmHdr = comm.h daemon.h linux-list.h log.h
-Tgt = ${UsrBin}
+Tgt = ${UsrBin} aufhsmd
 TgtObj = $(addsuffix .o, ${Tgt})
 
 all: ${Tgt}
