@@ -317,6 +317,45 @@ unsigned int au_fhsm_csum(struct aufhsm *fhsm)
 
 /* ---------------------------------------------------------------------- */
 
+/*
+ * load struct aufhsm from the given shared memory
+ */
+struct aufhsm *au_fhsm_load(char *name)
+{
+	struct aufhsm *fhsm, *p;
+	off_t len;
+	int err, fd;
+
+	p = NULL;
+	err = fhsm_map(name, &fd, &fhsm);
+	if (err)
+		goto out;
+
+	len = au_fhsm_size(fhsm->nwmark);
+	p = malloc(len);
+	if (!p) {
+		AuLogErr("malloc %d", fhsm->nwmark);
+		goto out_fd;
+	}
+	memcpy(p, fhsm, len);
+	err = munmap(fhsm, len);
+	if (err) {
+		p = NULL;
+		AuLogErr("unmap");
+	}
+
+out_fd:
+	err = close(fd);
+	if (err) {
+		p = NULL;
+		AuLogErr("close");
+	}
+out:
+	return p;
+}
+
+/* ---------------------------------------------------------------------- */
+
 void au_fhsm_dump(char *mntpnt, struct aufhsm *fhsm, union aufs_brinfo *brinfo,
 		  int nbr)
 {

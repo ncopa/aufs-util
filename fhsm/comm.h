@@ -92,6 +92,7 @@ int au_fhsm(char *name, int nfhsm, int nbr, union aufs_brinfo *brinfo,
 unsigned int au_fhsm_csum(struct aufhsm *fhsm);
 void au_fhsm_dump(char *mntpnt, struct aufhsm *fhsm, union aufs_brinfo *brinfo,
 		  int nbr);
+struct aufhsm *au_fhsm_load(char *name);
 
 /* list.c */
 int au_list_dir_set(char *dir, int need_ck);

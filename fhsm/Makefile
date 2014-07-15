@@ -21,8 +21,8 @@ Man5 = aufs_fhsm.5
 Man8 = $(addsuffix .8, ${UsrBin} ${UsrLib})
 Man = ${Man5} ${Man8}
 LibFhsm = libfhsm.a
-LibFhsmObj = fhsm.o list.o log.o msg.o shm.o
-LibFhsmHdr = comm.h log.h
+LibFhsmObj = event.o fhsm.o list.o log.o msg.o mvdown.o shm.o
+LibFhsmHdr = comm.h daemon.h linux-list.h log.h
 Tgt = ${UsrBin}
 TgtObj = $(addsuffix .o, ${Tgt})
 
