@@ -1,5 +1,5 @@
 
-# Copyright (C) 2005-2011 Junjiro R. Okajima
+# Copyright (C) 2005-2014 Junjiro R. Okajima
 #
 # This program, aufs is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,6 +52,11 @@ export
 all: ver_test ${Man} ${Bin} ${Etc}
 	${MAKE} -C libau $@
 	ln -sf ./libau/libau*.so .
+
+clean:
+	${RM} ${Man} ${Bin} ${Etc} ${LibUtil} libau.so* *~
+	${RM} ${BinObj} ${LibUtilObj}
+	${MAKE} -C libau $@
 
 ver_test: ver
 	./ver
@@ -112,10 +117,5 @@ install_ulib:
 	${MAKE} -C libau $@
 
 install: install_man install_sbin install_ubin install_etc install_ulib
-
-clean:
-	${RM} ${Man} ${Bin} ${Etc} ${LibUtil} libau.so* *~
-	${RM} ${BinObj} ${LibUtilObj}
-	${MAKE} -C libau $@
 
 -include priv.mk
