@@ -492,11 +492,11 @@ See linux/Documentation/ABI/*/{sys,debug}fs\-aufs.
 .TQ
 .B permission := rw | ro | rr
 .TQ
-.B attribute := wh | nolwh
+.B attribute := wh | nolwh | unpin | coo_reg | coo_all | moo
 dir_path is a directory path.
 The keyword after `dir_path=' is a
 permission flags for that branch.
-Comma, colon and the permission flags string (including `=')in the path
+Comma, colon and the permission flags string (including `=') in the path
 are not allowed.
 
 Any filesystem can be a branch, But some are not accepted such like
