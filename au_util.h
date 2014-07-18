@@ -82,6 +82,16 @@ int au_plink(char cwd[], int cmd, unsigned int flags, int *fd);
 void au_print_ent(struct mntent *ent);
 int au_update_mtab(char *mntpnt, int do_remount, int do_verbose);
 
+/* fhsm/fhsm.c */
+#ifdef AUFHSM
+void mng_fhsm(char *cwd, int unmount);
+#else
+static inline void mng_fhsm(char *cwd, int unmount)
+{
+	/* empty */
+}
+#endif
+
 #define _Dpri(fmt, ...)		printf("%s:%d:" fmt, \
 				       __func__, __LINE__, ##__VA_ARGS__)
 #ifdef DEBUG

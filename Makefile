@@ -18,6 +18,7 @@
 HOSTCC ?= cc
 override CPPFLAGS += -D_GNU_SOURCE
 override CPPFLAGS += -I./libau
+override CPPFLAGS += -DAUFHSM_CMD=\"/usr/bin/aufhsm\"
 override CFLAGS += -O -Wall
 INSTALL ?= install
 Install = ${INSTALL} -o root -g root -p
