@@ -56,3 +56,5 @@ install: install_ulib
 clean:
 	${RM} ${LibSo} ${LibSo}.* ${LibSoObj} *~
 	test -L rdu64.c && ${RM} rdu64.c || :
+
+-include priv.mk
