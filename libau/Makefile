@@ -27,18 +27,18 @@ all: ${LibSo}
 # this is unnecessary on 64bit system?
 rdu64.c: rdu.c
 	ln -sf $< $@
-rdu64.o: CPPFLAGS += -DRdu64
+rdu64.o: override CPPFLAGS += -DRdu64
 .INTERMEDIATE.: rdu64.c
 
-${LibSoObj}: CPPFLAGS += -DNDEBUG -D_REENTRANT -I.
-${LibSoObj}: CFLAGS += -fPIC
+${LibSoObj}: override CPPFLAGS += -DNDEBUG -D_REENTRANT -I.
+${LibSoObj}: override CFLAGS += -fPIC
 ${LibSoObj}: %.o: %.c ${LibSoHdr}
 ${LibSo}: ${LibSo}.${LibSoMajor}
 	ln -sf $< $@
 ${LibSo}.${LibSoMajor}: ${LibSo}.${LibSoMajor}.${LibSoMinor}
 	ln -sf $< $@
-${LibSo}.${LibSoMajor}.${LibSoMinor}: LDFLAGS += -s
-${LibSo}.${LibSoMajor}.${LibSoMinor}: LDLIBS += -ldl -lpthread
+${LibSo}.${LibSoMajor}.${LibSoMinor}: override LDFLAGS += -s
+${LibSo}.${LibSoMajor}.${LibSoMinor}: override LDLIBS += -ldl -lpthread
 ${LibSo}.${LibSoMajor}.${LibSoMinor}: ${LibSoObj}
 	${CC} --shared -Wl,-soname,${LibSo}.${LibSoMajor} ${LDFLAGS} \
 		-o $@ $^ ${LDLIBS}

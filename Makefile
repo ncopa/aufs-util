@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
 HOSTCC ?= cc
-CPPFLAGS += -I./libau
-CFLAGS += -O -Wall
+override CPPFLAGS += -I./libau
+override CFLAGS += -O -Wall
 
 # MountCmdPath: dirty trick to support local nfs-mount.
 # - on a single host, mount aufs, export it via nfs, and mount it again
@@ -61,7 +61,7 @@ clean:
 ver_test: ver
 	./ver
 
-${Bin}: LDFLAGS += -static -s
+${Bin}: override LDFLAGS += -static -s
 ${Bin}: LDLIBS = -L. -lautil
 ${BinObj}: %.o: %.c ${LibUtilHdr} ${LibUtil}
 
