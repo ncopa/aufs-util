@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011 Junjiro R. Okajima
+# Copyright (C) 2005-2014 Junjiro R. Okajima
 #
 # This program, aufs is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ ${LibSo}: ${LibSo}.${LibSoMajor}
 	ln -sf $< $@
 ${LibSo}.${LibSoMajor}: ${LibSo}.${LibSoMajor}.${LibSoMinor}
 	ln -sf $< $@
+${LibSo}.${LibSoMajor}.${LibSoMinor}: LDFLAGS += -s
 ${LibSo}.${LibSoMajor}.${LibSoMinor}: LDLIBS += -ldl -lpthread
 ${LibSo}.${LibSoMajor}.${LibSoMinor}: ${LibSoObj}
 	${CC} --shared -Wl,-soname,${LibSo}.${LibSoMajor} ${LDFLAGS} \
@@ -45,8 +46,8 @@ install_ulib: File = ${LibSo}.${LibSoMajor}.${LibSoMinor}
 install_ulib: Tgt = ${DESTDIR}/usr/lib
 install_ulib: ${File}
 	install -d ${Tgt}
-	${Install} -m 644 -s ${File} ${Tgt}
-	# -m 6755
+	${Install} -m 644 ${File} ${Tgt}
+	# -m 755
 	ln -sf ${File} ${Tgt}/${LibSo}.${LibSoMajor}
 	ln -sf ${LibSo}.${LibSoMajor} ${Tgt}/${LibSo}
 
