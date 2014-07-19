@@ -46,11 +46,12 @@ ${LibSo}.${LibSoMajor}.${LibSoMinor}: ${LibSoObj}
 install_ulib: File = ${LibSo}.${LibSoMajor}.${LibSoMinor}
 install_ulib: Tgt = ${DESTDIR}/usr/lib
 install_ulib: ${File}
-	install -d ${Tgt}
+	${INSTALL} -d ${Tgt}
 	${Install} -m 644 ${File} ${Tgt}
 	# -m 755
 	ln -sf ${File} ${Tgt}/${LibSo}.${LibSoMajor}
 	ln -sf ${LibSo}.${LibSoMajor} ${Tgt}/${LibSo}
+install: install_ulib
 
 clean:
 	${RM} ${LibSo} ${LibSo}.* ${LibSoObj} *~

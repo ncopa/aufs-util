@@ -18,6 +18,9 @@
 HOSTCC ?= cc
 override CPPFLAGS += -I./libau
 override CFLAGS += -O -Wall
+INSTALL ?= install
+Install = ${INSTALL} -o root -g root -p
+ManDir = /usr/share/man
 
 # MountCmdPath: dirty trick to support local nfs-mount.
 # - on a single host, mount aufs, export it via nfs, and mount it again
@@ -92,30 +95,28 @@ aufs.5: aufs.in.5 c2tmac
 c2sh c2tmac ver: CC = ${HOSTCC}
 .INTERMEDIATE: c2sh c2tmac ver
 
-Install = install -o root -g root -p
 install_sbin: File = auibusy aumvdown auplink mount.aufs umount.aufs
 install_sbin: Tgt = ${DESTDIR}/sbin
 install_ubin: File = aubusy auchk aubrsync #auctl
 install_ubin: Tgt = ${DESTDIR}/usr/bin
 install_sbin install_ubin: ${File}
-	install -d ${Tgt}
+	${INSTALL} -d ${Tgt}
 	${Install} -m 755 ${File} ${Tgt}
 install_etc: File = etc_default_aufs
 install_etc: Tgt = ${DESTDIR}/etc/default/aufs
 install_etc: ${File}
-	install -d $(dir ${Tgt})
+	${INSTALL} -d $(dir ${Tgt})
 	${Install} -m 644 -T ${File} ${Tgt}
 install_man5: File = aufs.5
-install_man5: Tgt = ${DESTDIR}/usr/share/man/man5
+install_man5: Tgt = ${DESTDIR}${ManDir}/man5
 install_man8: File = aumvdown.8
-install_man8: Tgt = ${DESTDIR}/usr/share/man/man8
+install_man8: Tgt = ${DESTDIR}${ManDir}/man8
 install_man5 install_man8: ${File}
-	install -d ${Tgt}
+	${INSTALL} -d ${Tgt}
 	${Install} -m 644 ${File} ${Tgt}
 install_man: install_man5 install_man8
-install_ulib:
-	${MAKE} -C libau $@
 
-install: install_man install_sbin install_ubin install_etc install_ulib
+install: install_man install_sbin install_ubin install_etc
+	${MAKE} -C libau $@
 
 -include priv.mk
