@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011 Junjiro R. Okajima
+# Copyright (C) 2005-2014 Junjiro R. Okajima
 #
 # This program, aufs is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,16 +27,18 @@ all: ${LibSo}
 # this is unnecessary on 64bit system?
 rdu64.c: rdu.c
 	ln -sf $< $@
-rdu64.o: CFLAGS += -DRdu64
+rdu64.o: override CPPFLAGS += -DRdu64
 .INTERMEDIATE.: rdu64.c
 
-${LibSoObj}: CFLAGS += -fPIC -DNDEBUG -D_REENTRANT -I.
+${LibSoObj}: override CPPFLAGS += -DNDEBUG -D_REENTRANT -I.
+${LibSoObj}: override CFLAGS += -fPIC
 ${LibSoObj}: %.o: %.c ${LibSoHdr}
 ${LibSo}: ${LibSo}.${LibSoMajor}
 	ln -sf $< $@
 ${LibSo}.${LibSoMajor}: ${LibSo}.${LibSoMajor}.${LibSoMinor}
 	ln -sf $< $@
-${LibSo}.${LibSoMajor}.${LibSoMinor}: LDLIBS += -ldl -lpthread
+${LibSo}.${LibSoMajor}.${LibSoMinor}: override LDFLAGS += -s
+${LibSo}.${LibSoMajor}.${LibSoMinor}: override LDLIBS += -ldl -lpthread
 ${LibSo}.${LibSoMajor}.${LibSoMinor}: ${LibSoObj}
 	${CC} --shared -Wl,-soname,${LibSo}.${LibSoMajor} ${LDFLAGS} \
 		-o $@ $^ ${LDLIBS}
@@ -44,12 +46,15 @@ ${LibSo}.${LibSoMajor}.${LibSoMinor}: ${LibSoObj}
 install_ulib: File = ${LibSo}.${LibSoMajor}.${LibSoMinor}
 install_ulib: Tgt = ${DESTDIR}/usr/lib
 install_ulib: ${File}
-	install -d ${Tgt}
-	${Install} -m 644 -s ${File} ${Tgt}
-	# -m 6755
+	${INSTALL} -d ${Tgt}
+	${Install} -m 644 ${File} ${Tgt}
+	# -m 755
 	ln -sf ${File} ${Tgt}/${LibSo}.${LibSoMajor}
 	ln -sf ${LibSo}.${LibSoMajor} ${Tgt}/${LibSo}
+install: install_ulib
 
 clean:
 	${RM} ${LibSo} ${LibSo}.* ${LibSoObj} *~
 	test -L rdu64.c && ${RM} rdu64.c || :
+
+-include priv.mk

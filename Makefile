@@ -1,5 +1,5 @@
 
-# Copyright (C) 2005-2011 Junjiro R. Okajima
+# Copyright (C) 2005-2014 Junjiro R. Okajima
 #
 # This program, aufs is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +16,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
 HOSTCC ?= cc
-CFLAGS += -I./libau
-CFLAGS += -O -Wall
+override CPPFLAGS += -I./libau
+override CFLAGS += -O -Wall
+INSTALL ?= install
+Install = ${INSTALL} -o root -g root -p
+ManDir = /usr/share/man
 
 # MountCmdPath: dirty trick to support local nfs-mount.
 # - on a single host, mount aufs, export it via nfs, and mount it again
@@ -53,10 +56,15 @@ all: ver_test ${Man} ${Bin} ${Etc}
 	${MAKE} -C libau $@
 	ln -sf ./libau/libau*.so .
 
+clean:
+	${RM} ${Man} ${Bin} ${Etc} ${LibUtil} libau.so* *~
+	${RM} ${BinObj} ${LibUtilObj}
+	${MAKE} -C libau $@
+
 ver_test: ver
 	./ver
 
-${Bin}: LDFLAGS += -static -s
+${Bin}: override LDFLAGS += -static -s
 ${Bin}: LDLIBS = -L. -lautil
 ${BinObj}: %.o: %.c ${LibUtilHdr} ${LibUtil}
 
@@ -87,35 +95,28 @@ aufs.5: aufs.in.5 c2tmac
 c2sh c2tmac ver: CC = ${HOSTCC}
 .INTERMEDIATE: c2sh c2tmac ver
 
-Install = install -o root -g root -p
 install_sbin: File = auibusy aumvdown auplink mount.aufs umount.aufs
 install_sbin: Tgt = ${DESTDIR}/sbin
 install_ubin: File = aubusy auchk aubrsync #auctl
 install_ubin: Tgt = ${DESTDIR}/usr/bin
 install_sbin install_ubin: ${File}
-	install -d ${Tgt}
+	${INSTALL} -d ${Tgt}
 	${Install} -m 755 ${File} ${Tgt}
 install_etc: File = etc_default_aufs
 install_etc: Tgt = ${DESTDIR}/etc/default/aufs
 install_etc: ${File}
-	install -d $(dir ${Tgt})
+	${INSTALL} -d $(dir ${Tgt})
 	${Install} -m 644 -T ${File} ${Tgt}
 install_man5: File = aufs.5
-install_man5: Tgt = ${DESTDIR}/usr/share/man/man5
+install_man5: Tgt = ${DESTDIR}${ManDir}/man5
 install_man8: File = aumvdown.8
-install_man8: Tgt = ${DESTDIR}/usr/share/man/man8
+install_man8: Tgt = ${DESTDIR}${ManDir}/man8
 install_man5 install_man8: ${File}
-	install -d ${Tgt}
+	${INSTALL} -d ${Tgt}
 	${Install} -m 644 ${File} ${Tgt}
 install_man: install_man5 install_man8
-install_ulib:
-	${MAKE} -C libau $@
 
-install: install_man install_sbin install_ubin install_etc install_ulib
-
-clean:
-	${RM} ${Man} ${Bin} ${Etc} ${LibUtil} libau.so* *~
-	${RM} ${BinObj} ${LibUtilObj}
+install: install_man install_sbin install_ubin install_etc
 	${MAKE} -C libau $@
 
 -include priv.mk
