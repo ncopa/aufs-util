@@ -33,27 +33,45 @@ UmountCmd=/bin/umount
 override CPPFLAGS += -DMOUNT_CMD=\"${MountCmd}\"
 override CPPFLAGS += -DUMOUNT_CMD=\"${UmountCmd}\"
 
+#
+# BuildFHSM: specify building FHSM tools
+#
+BuildFHSM = yes
+ifeq (${BuildFHSM},yes)
+override CPPFLAGS += -DAUFHSM
+LibUtilObj = mng_fhsm.o
+define MakeFHSM
+	${MAKE} -C fhsm ${1}
+endef
+else
+define MakeFHSM
+	# empty
+endef
+endif
+
 Cmd = aubusy auchk aubrsync
 Man = aufs.5
 Etc = etc_default_aufs
 Bin = auibusy aumvdown auplink mount.aufs umount.aufs #auctl
 BinObj = $(addsuffix .o, ${Bin})
 LibUtil = libautil.a
-LibUtilObj = perror.o proc_mnt.o br.o plink.o mtab.o
+LibUtilObj += perror.o proc_mnt.o br.o plink.o mtab.o
 LibUtilHdr = au_util.h
 
 # suppress 'eval' for ${v}
-$(foreach v, CPPFLAGS CFLAGS INSTALL Install ManDir, \
+$(foreach v, CPPFLAGS CFLAGS INSTALL Install ManDir LibUtilHdr, \
 	$(eval MAKE += ${v}="$${${v}}"))
 
 all: ver_test ${Man} ${Bin} ${Etc}
 	${MAKE} -C libau $@
 	ln -sf ./libau/libau*.so .
+	$(call MakeFHSM, $@)
 
 clean:
 	${RM} ${Man} ${Bin} ${Etc} ${LibUtil} libau.so* *~
 	${RM} ${BinObj} ${LibUtilObj}
 	${MAKE} -C libau $@
+	$(call MakeFHSM, $@)
 
 ver_test: ver
 	./ver
@@ -112,5 +130,6 @@ install_man: install_man5 install_man8
 
 install: install_man install_sbin install_ubin install_etc
 	${MAKE} -C libau $@
+	$(call MakeFHSM, $@)
 
 -include priv.mk
