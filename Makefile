@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
 HOSTCC ?= cc
-CFLAGS += -I./libau
+CPPFLAGS += -I./libau
 CFLAGS += -O -Wall
 
 # MountCmdPath: dirty trick to support local nfs-mount.

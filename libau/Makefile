@@ -27,10 +27,11 @@ all: ${LibSo}
 # this is unnecessary on 64bit system?
 rdu64.c: rdu.c
 	ln -sf $< $@
-rdu64.o: CFLAGS += -DRdu64
+rdu64.o: CPPFLAGS += -DRdu64
 .INTERMEDIATE.: rdu64.c
 
-${LibSoObj}: CFLAGS += -fPIC -DNDEBUG -D_REENTRANT -I.
+${LibSoObj}: CPPFLAGS += -DNDEBUG -D_REENTRANT -I.
+${LibSoObj}: CFLAGS += -fPIC
 ${LibSoObj}: %.o: %.c ${LibSoHdr}
 ${LibSo}: ${LibSo}.${LibSoMajor}
 	ln -sf $< $@
