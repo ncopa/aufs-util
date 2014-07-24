@@ -20,7 +20,10 @@
 #define __AUFS_UTIL_H__
 
 #include <errno.h>
+
+#ifdef __GNU_LIBRARY__
 #include <error.h>
+#endif
 
 #define AuVersion "aufs-util for aufs3.9 and later"
 
@@ -42,6 +45,11 @@
 extern int au_errno;
 extern const char *au_errlist[];
 void au_perror(const char *s);
+#ifndef __GNU_LIBRARY__
+/* musl libc has 'program_invocation_name', but doesn't have error_at_line() */
+void error_at_line(int status, int errnum, const char *filename,
+		   unsigned int linenum, const char *format, ...)
+#endif
 
 /* proc_mounts.c */
 struct mntent;
