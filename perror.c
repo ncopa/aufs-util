@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Junjiro R. Okajima
+ * Copyright (C) 2013-2014 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,12 @@
  */
 
 #include <stdio.h>
+
+#ifndef __GNU_LIBRARY__
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#endif /* __GNU_LIBRARY__ */
 
 #include <linux/aufs_type.h>
 #include "au_util.h"
@@ -48,3 +54,19 @@ void au_perror(const char *s)
 		fprintf(stderr, "%s%sUnknown error %d\n", s, colon, au_errno);
 	fflush(stderr);
 }
+
+#ifndef __GNU_LIBRARY__
+void error_at_line(int status, int errnum, const char *filename,
+		   unsigned int linenum, const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	fprintf(stderr, "%s:%s:%d: ",
+		program_invocation_name, filename, linenum);
+	vfprintf(stderr, format, ap);
+	fprintf(stderr, ": %s\n", errnum ? strerror(errnum) : "");
+	va_end(ap);
+	if (status)
+		exit(status);
+}
+#endif /* __GNU_LIBRARY__ */

@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
 HOSTCC ?= cc
+override CPPFLAGS += -D_GNU_SOURCE
 override CPPFLAGS += -I./libau
 override CFLAGS += -O -Wall
 INSTALL ?= install

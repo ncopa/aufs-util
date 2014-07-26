@@ -18,7 +18,6 @@
 
 #define _FILE_OFFSET_BITS	64	/* ftw.h */
 #define _XOPEN_SOURCE		500	/* ftw.h */
-#define _GNU_SOURCE			/* ftw.h */
 
 #include <sys/ioctl.h>
 #include <sys/resource.h>
