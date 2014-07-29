@@ -51,7 +51,10 @@ BinObj = $(addsuffix .o, ${Bin})
 LibUtil = libautil.a
 LibUtilObj = perror.o proc_mnt.o br.o plink.o mtab.o
 LibUtilHdr = au_util.h
-export
+
+# suppress 'eval' for ${v}
+$(foreach v, CPPFLAGS CFLAGS INSTALL Install ManDir, \
+	$(eval MAKE += ${v}="$${${v}}"))
 
 all: ver_test ${Man} ${Bin} ${Etc}
 	${MAKE} -C libau $@
