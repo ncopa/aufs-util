@@ -66,6 +66,14 @@ o /sbin/auplink
   Handles aufs pseudo-link at remount/unmount time. You can invoke it
   manually at anytime.
 
+o /sbin/aumvdown
+  Operates aufs internal feature "move-down" (opposite of
+  "copy-up"). See aumvdown.8 in detail.
+
+o /usr/bin/aubusy
+  Prints PIDs which make the branch busy and un-removable.
+  It runs /sbin/auibusy internally.
+
 o /usr/bin/auchk
   Similar to generic fsck. Checks whether a branch is healthy or not
   from aufs's point of view.
