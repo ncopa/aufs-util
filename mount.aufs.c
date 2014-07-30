@@ -133,14 +133,18 @@ static void do_mount(char *dev, char *mntpnt, int argc, char *argv[],
 			*a++ = argv[i];
 	*a++ = dev;
 	*a++ = mntpnt;
-	*a++ = NULL;
+	*a = NULL;
+
+	i = a - av;
+	if (i > ac)
+		AuFin("internal error, %d > %d\n", i, ac);
 
 #ifdef DEBUG
 	for (i = 0; av[i] && i < ac; i++)
 		puts(av[i]);
 	exit(0);
 #endif
-	execvp(MOUNT_CMD_PATH "mount", av);
+	execv(MOUNT_CMD, av);
 	AuFin("mount");
 }
 
