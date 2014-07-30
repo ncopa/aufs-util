@@ -140,7 +140,7 @@ static void do_mount(char *dev, char *mntpnt, int argc, char *argv[],
 		puts(av[i]);
 	exit(0);
 #endif
-	execvp(MOUNT_CMD_PATH "mount", av);
+	execv(MOUNT_CMD, av);
 	AuFin("mount");
 }
 
