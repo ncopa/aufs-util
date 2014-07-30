@@ -56,7 +56,12 @@ int main(int argc, char *argv[])
 	for (j = 2; j < argc; j++)
 		av[i++] = argv[j];
 	av[i++] = mntpnt;
-	av[i++] = NULL;
+	av[i] = NULL;
+
+	j = sizeof(av) / sizeof(*av);
+	if (i > j)
+		AuFin("internal error, %d > %d\n", i, j);
+
 	execv(UMOUNT_CMD, av);
 
 out:
