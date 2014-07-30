@@ -138,6 +138,7 @@ int au_update_mtab(char *mntpnt, int do_remount, int do_verbose)
 	int err, fd, status, e2;
 	pid_t pid;
 	ino_t ino;
+	dev_t dev;
 	struct stat st;
 	struct statfs stfs;
 	struct flock flock = {
@@ -178,6 +179,7 @@ int au_update_mtab(char *mntpnt, int do_remount, int do_verbose)
 	if (err)
 		perror(pid_file);
 	ino = st.st_ino;
+	dev = st.st_dev;
 
 	err = waitpid(pid, &status, 0);
 	if (err < 0) {
@@ -193,9 +195,9 @@ int au_update_mtab(char *mntpnt, int do_remount, int do_verbose)
 		perror(pid_file);
 	e2 = stat(MTab "~", &st);
 	if (!e2) {
-		if (st.st_ino == ino) {
+		if (st.st_dev == dev && st.st_ino == ino) {
 			/*
-			 * The inode number is same,
+			 * The device/inode number is same,
 			 * it means it is we who made the file.
 			 * If someone else removed our file between stat(2) and
 			 * unlink(2), it is a breakage of the rule.
