@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Junjiro R. Okajima
+ * Copyright (C) 2005-2014 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -206,7 +206,9 @@ int au_update_mtab(char *mntpnt, int do_remount, int do_verbose)
 		}
 	} else if (errno != ENOENT)
 		perror(MTab "~");
-	fclose(fp);
+	e2 = fclose(fp);
+	if (e2)
+		perror(MTab);
 
  out:
 	return err;
