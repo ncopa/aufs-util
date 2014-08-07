@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Junjiro R. Okajima
+ * Copyright (C) 2010-2014 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
 		if (err)
 			AuFin(NULL);
 	}
+	mng_fhsm(mntpnt, /*umount*/1);
 
 	i = 0;
 	av[i++] = "umount";

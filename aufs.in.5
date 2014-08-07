@@ -492,7 +492,7 @@ See linux/Documentation/ABI/*/{sys,debug}fs\-aufs.
 .TQ
 .B permission := rw | ro | rr
 .TQ
-.B attribute := wh | nolwh | unpin | coo_reg | coo_all | moo
+.B attribute := wh | nolwh | unpin | coo_reg | coo_all | moo | fhsm
 dir_path is a directory path.
 The keyword after `dir_path=' is a
 permission flags for that branch.
@@ -630,7 +630,7 @@ Users who have many (over 100) branches want to know and analyse
 when and what file is copied\-up. To insert a new upper branch which
 contains such files only may improve the performance of aufs.
 The `copy\-up on open' itself may not be so attractive, but combining
-with a future feature FHSM (File\-based Hierarchy Storage Management)
+with a feature FHSM (File\-based Hierarchy Storage Management)
 will be useful.
 .
 .TP
@@ -645,8 +645,16 @@ only the last specifed one has its effect. Other coo/moo attributes are
 silently ignored.
 
 The `move\-up on open' itself may not be so attractive, but combining
-with a future feature FHSM (File\-based Hierarchy Storage Management)
+with a feature FHSM (File\-based Hierarchy Storage Management)
 will be useful.
+.
+.TP
+.B fhsm
+File\-based Hierarchy Storage Management.
+Specifies that this branch is a participant of aufs FHSM. Refer to
+.B
+aufs_fhsm(5)
+in detail.
 
 .\" .SS FUSE as a branch
 .\" A FUSE branch needs special attention.

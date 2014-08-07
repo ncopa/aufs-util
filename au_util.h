@@ -58,6 +58,14 @@ int au_proc_getmntent(char *mntpnt, struct mntent *rent);
 /* br.c */
 union aufs_brinfo;
 int au_br(union aufs_brinfo **brinfo, int *nbr, char *root);
+#ifdef AUFHSM
+int au_nfhsm(int nbr, union aufs_brinfo *brinfo);
+int au_br_qsort_path(const void *_a, const void *_b);
+void au_br_sort_path(int nbr, union aufs_brinfo *brinfo);
+int au_br_bsearch_path(const void *_path, const void *_brinfo);
+union aufs_brinfo *au_br_search_path(char *path, int nbr,
+				     union aufs_brinfo *brinfo);
+#endif
 
 /* plink.c */
 enum {
@@ -73,6 +81,16 @@ int au_plink(char cwd[], int cmd, unsigned int flags, int *fd);
 /* mtab.c */
 void au_print_ent(struct mntent *ent);
 int au_update_mtab(char *mntpnt, int do_remount, int do_verbose);
+
+/* fhsm/fhsm.c */
+#ifdef AUFHSM
+void mng_fhsm(char *cwd, int unmount);
+#else
+static inline void mng_fhsm(char *cwd, int unmount)
+{
+	/* empty */
+}
+#endif
 
 #define _Dpri(fmt, ...)		printf("%s:%d:" fmt, \
 				       __func__, __LINE__, ##__VA_ARGS__)

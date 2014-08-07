@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# Copyright (C) 2011-2014 Junjiro R. Okajima
+#
+# This program, aufs is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# aufs FHSM, the lister
+
+# $0 output_dir output_filename
+
+# print the files which should be moved-down.
+# the list is processed in reverse order, ie. bottom to top.
+# format: <atime> <space> <blocks> <space> <path> <null>
+
+set -eu
+rc=${DebugRc:-/etc/default/aufs}
+. $rc
+
+umask 0
+
+dst=$1/$2
+tmp=$1/$$
+find . -xdev -type f -links 1 \
+	! -name "${AUFS_WH_PFX}*" \
+	-printf '%A@ %b %P\0' > $dst
+
+# find . -xdev -maxdepth 1 -printf '%P\n' |
+# while read i
+# do find "$i" -xdev -type f -links 1 \
+# 	! -name "${AUFS_WH_PFX}*" \
+# 	-fprintf '%A@ %b %p\0' "$dst.$i.list" &
+# done
+# wait
+# cat "$dst.*.list" > $dst
+
+#tr '\0' '\n' < $dst >> $dbg
+
+# Hoping sort(1) may gain performance, without pipes.
+# todo: for MP systems, develop the parallel-sort in the future
+sort -nz -k2 $dst > $tmp
+sort -rsnz $tmp > $dst
+rm -f $tmp

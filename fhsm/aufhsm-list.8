@@ -1,0 +1,54 @@
+.\" .so aufhsm-inc.8
+.\" .so an-ext.tmac
+.\" see groff_man(7)
+
+.TH aufhsm-list 8 Linux "Linux Aufs User's Manual"
+.SH NAME
+aufhsm\-list \- AUFS File-based Hierarchical Storage Management (FHSM), the
+lister
+
+.\" ----------------------------------------------------------------------
+.SH SYNOPSIS
+.SY aufhsm\-list
+.RI output_dir
+.RI output_filename
+.YS
+
+.\" ----------------------------------------------------------------------
+.SH DESCRIPTION
+Generates a filename list in the format of
+
+.nf
+<atime> <space> <blocks> <space> <path> <null>.
+.fi
+
+This command is invoked by aufhsmd(8) internally in order to decide the
+"move\-down" target files.
+
+Since this is a simple shell script (currently), you can re-write and
+get the better performance if you want.
+
+.\" ----------------------------------------------------------------------
+.\" .SH OPTIONS
+.\" ----------------------------------------------------------------------
+.\" .SH ERRORS
+.\" ----------------------------------------------------------------------
+.\" .SH ENVIRONMENT
+.\" ----------------------------------------------------------------------
+.\" .SH NOTES
+.\" ----------------------------------------------------------------------
+.\" .SH BUGS
+.\" ----------------------------------------------------------------------
+.\" .SH EXAMPLE
+.\" ----------------------------------------------------------------------
+.SH SEE ALSO
+.BR aufs_fhsm (5),
+.BR aufhsm (8),
+.BR aufhsmd (8),
+.BR aufs (5)
+
+.SH COPYRIGHT
+Copyright \(co 2011-2014 Junjiro R. Okajima
+
+.SH AUTHOR
+Junjiro R. Okajima

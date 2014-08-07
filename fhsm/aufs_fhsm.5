@@ -1,0 +1,412 @@
+.eo
+.de TQ
+.br
+.ns
+.TP \$1
+..
+.de Bu
+.IP \(bu 4
+..
+.ec
+.\" end of macro definitions
+.
+.\" ----------------------------------------------------------------------
+.TH aufs_fhsm 5 Linux "Linux Aufs User's Manual"
+.SH NAME
+aufhsm\-list \- AUFS File\-based Hierarchical Storage Management (FHSM)
+
+.\" ----------------------------------------------------------------------
+.\" .SH DESCRIPTION
+Hierarchical Storage Management (or HSM) is a well\-known feature in the
+storage world. Aufs provides this feature as file\-based with multiple
+writable branches, based upon the principle of "Colder\-Lower".
+Here the word "colder" means that the less used files, and "lower" means
+that the position in the order of the stacked branches.
+These multiple writable branches are prioritized, ie. the topmost one
+should be the fastest drive and be used heavily.
+
+.\" ----------------------------------------------------------------------
+.SH the Controller
+.SS What the controller does
+.RS
+.Bu
+create a POSIX shared memory and store the user\-specified watermarks
+in it.
+.Bu
+control the life of the daemon.
+.Bu
+make the daemon to re\-read the watermarks.
+.RE
+
+.SS Shared memory and protection
+The controller allocates the POSIX shared memory (under /dev/shm
+generally which is decided by system) and
+initializes it by setting the default watermarks. User can change the
+watermarks by invoking the controller manually.
+
+Since the controller can be invoked anytime, it may happen that the
+multiple instances run concurrently. To protect the watermarks in the
+shared memory from concurrent modification, the controller sets
+fcntl(F_SETLKW) to the shared memory.
+
+This lock also protects the watermark from the daemon which reads
+the watermark, ie. prohibit reading it during the controller is
+modifying.
+
+.\" ----------------------------------------------------------------------
+.SH the Daemon
+.SS What the daemon does
+.RS
+.Bu
+invoked by the controller at aufs mount\-time.
+.Bu
+read the user\-specified watermarks stored in POSIX shared memory, and
+keep a copy of it internally.
+.Bu
+establish the two communications. One for aufs and the other is for the
+controller.
+
+.RS
+.Bu
+use a named pipe (under the same dir to POSIX shared memory) to
+communicate with the controller.
+.Bu
+the controller may not exist at that time, but it may appear and tell the daemon
+something later.
+.Bu
+use a special file descriptor (created by aufs ioctl(2)) to receive a
+notification from aufs.
+.RE
+
+.Bu
+create epollfd and signalfd too in order to monitor the notifications
+from user, aufs and the controller.
+.Bu
+main loop, monitor these three file descriptors.
+
+.RS
+.Bu
+signal is sent (to signalfd, generally from user).
+
+--> exit.
+.Bu
+notified from the controller.
+
+--> take an action according to the message, eg, read the watermarks
+again or exit.
+.Bu
+notified from aufs.
+
+--> run the move\-down operation.
+.RE
+.RE
+
+.SSSignal handling
+Generally speaking, users should not send SIGKILL to any process
+easily. That is the final resort to force terminating the process, and
+SIGTERM is preferable in most cases.
+The daemon handles these signals.
+
+.TP
+.B SIGINT
+.TQ
+.B SIGQUIT
+.TQ
+.B SIGTERM
+Exit naturally.
+
+.TP
+.B SIGHUP
+This has no meaning. It is handled just because many other
+generic daemons handle it to re\-read their configuration. For
+this daemon, such configuration is done via the controller and
+SIGHUP is not really necessary.
+But users who might not read the documents about this daemon may
+try sending SIGHUP blindly, with expecting to make the daemon
+refreshes some configuration. It is totally wrong actually, but
+the daemon will allow such users and simply ignore
+SIGHUP. Otherwise the signal will terminate the process.
+
+.TP
+.B SIGCHLD
+During the daemon invokes a child process and it is running, the
+daemon handles SIGCHLD too in order not to make the child zombie.
+
+All other signals are not handled and will take the default actions.
+
+.SS Messages from the controller
+The controller controls the life of daemon. It invokes and terminates
+the daemon.
+
+For invoking, the controller simply runs the daemon. If the daemon for
+the same aufs mount\-point is already running, then the daemon detects
+it by itself (told by aufs, actually) and exits. So a single aufs
+mount\-point will never have multiple corresponding daemons.
+
+For terminating, the controller opens a fifo to communicate with the
+daemon, and sends a certain message. Then the daemon exists
+successfully.
+
+By remounting aufs mount\-point and adding/deleting its member
+branches, the number of watermarks will change and the daemon should
+track it. So there is a message to make the daemon re\-read the
+watermarks.
+
+All these messages are sent from the controller automagically when it
+is invoked by /sbin/mount.aufs. But user can send the messages anytime
+he wants by running the controller manually.
+
+.SS Notification from aufs (kernel\-space)
+When user issues write(2) to a file in aufs, aufs processes the
+request as usual, and tell the daemon the news via the special file
+descriptor. The special file descriptor is created based upon the
+ioctl(2) from the daemon. If it is not created (eg. the daemon is not
+running), aufs doesn't make the notification.
+
+Aufs can detect the simple write to the branch fs, but cannot detect
+the complicated one which is "mmap + fixing a hole". In this case, the
+notification is not sent.
+
+If user places the XINO files on the writable branch (which is put on
+the first writable branch by default), the notification is not sent
+when the size of XINO files grows either. When you use FHSM feature, it
+is recommended to specify the path of XINO as outside of aufs.
+
+If user modifes a file on the writable branch directly (bypassing
+aufs) and the size of the file grows, then the notification is not
+sent either.
+(Someday in the future, aufs may provide another feature to support
+this case)
+
+.\" ----------------------------------------------------------------------
+.SH the Lister
+
+.SS The list of filenames which should be moved\-down
+The daemon runs the external list\-command (the lister, which is find(1)
+and sort(1) currently) in order to get the filename list.
+The list is sorted by the timestamp (atime) and consumed blocks by the
+file. This sort decides the order/priority of files to be moved\-down.
+First, the most unused file should be moved\-down. This is decided by
+the timestamp (atime) of the file.
+When multiple files has the same atime, then they are sorted again by
+the consumed blocks, which means the larger file will be moved\-down
+earlier.
+
+It means users should not specify "noatime" mount option for the aufs
+branch. "relatime" (the linux default) will be OK, but it may lead us
+to a rough (the precision may not be high) decision. "strictatime"
+will be best.
+Note that "strictatime" may costs high due to its frequent update of
+atime. My general recommendation is "relatime" (the linux default).
+
+.SS Caution
+The scan to get the file list may cost high. it will be equivalent to
+"find /branch/fs \-ls" and sort.
+Additionally the size of the list may be huge.
+
+.SS Suggested solutions
+Since the lister is an external command, user can customize it
+easily. For example, when the disk where the branch fs resides is RAID
+(or something) and can endure the multiple find(1), then we may invoke
+find(1) for every first level entries in the branch. For example,
+
+.nf
+$ find . -maxdepth 1 -printf '%P\\n' |
+> while read i
+> do find $i ...conditions... -fprintf 'format' /tmp/$i.list &
+> done
+$ wait
+.fi
+
+This approach will be effective when the disk drive is fast enough and
+allows multiple find(1). And it may be better to have multiple CPUs.
+
+For sorting, which is also a CPU eater when the list is large, it is a
+good idea to develop a new multi\-threaded sort command if user have
+multiple CPUs.
+
+.SS Which file to be moved\-down
+Currently we handle the single\-linked and not\-in\-use regular files
+only.
+The directories, special files, etc are not moved\-down.
+The hard\-linked (pseudo-link in aufs) files (whose link count is more than one) are not
+moved\-down either.
+
+.\" ----------------------------------------------------------------------
+.SH Move\-down operation
+.SS What the move\-down does
+.RS
+.Bu
+the daemon receives a notification from aufs.
+.Bu
+compare the ratio of consumed blocks and inodes with the user\-specified
+watermarks (in local\-copy). if it doesn't exceed, the operation
+doesn't start.
+.
+.Bu
+fork a child process to process the branch which exceed the watermark.
+.Bu
+get the writable branch root by special aufs ioctl(2).
+(the file descriptor may be got by simple open(2). but the branch may
+be hidden from userspace, so it is better to ask aufs)
+.Bu
+fchdir(2) to the writable branch root and run the external
+lister to get the sorted filename list to move\-down.
+.Bu
+pick a single filename from the list.
+.Bu
+open the file and issue a special aufs ioctl(2) to it (the body of move\-down).
+.Bu
+if it succeeds, then try next filename and continue until reaching the
+lower watermark or the end of the list. Or the destination (the next
+lower writable branch) may exceed the upper watermark.
+.Bu
+if the move\-down ioctl(2) returns an error, we need to handle it
+according to its reason. (see below)
+.Bu
+additionally, during the child process is running the loop of
+processing the file list, the request to terminate the daemon may
+arrive from the controller or user. we also need to handle it.
+.RE
+
+.SS Move\-down one by one
+The child process (of the daemon) reads the list and move\-down
+the file one by one.
+If an recoverable error happens in the move\-down operation, the
+filename is appended to another list file in order to retry later.
+By moving\-down, the consumed blocks/index on the target branch may
+exceeds the watermark. If it happens, the child stops processing the
+current branch, tells its parent daemon to proceed to the target
+branch, and exits.
+The parent daemon receives the notification from its child, and forks
+a new child process to process the next (told as 'target') branch.
+It may happen recursively. And if the specified watermarks are very
+narrow (the range between upper and lower), it may also happen that
+repeated fork/exit. But I don't think it a problem (currently).
+
+When all the filenames in the list generated by the external command
+(the lister)
+are handled and a new notification arrived from aufs, the daemon
+recreate the list file.
+
+.SS Turn\-over
+The daemon begins the move\-down operation, and it ends when any of
+these things happen.
+.RS
+.Bu
+reach the lower watermark.
+.Bu
+reach the end of the list.
+.Bu
+the next lower writable branch exceeds the upper watermark.
+.Bu
+requested by user.
+.RE
+
+In all cases, the filename\-list remains. And the daemon in next turn
+begins with this list. But this time, there may exist the
+failed\-filename\-list which is generated by the previous turn (by EBUSY
+or ENOMEM). They are the filenames to be moved\-down still.
+So the daemon concatenates the filename\-list and the
+failed\-filename\-list before starting the move\-down operation, and makes
+the failed\-filename\-list empty. The failed filenames will be appended
+to the failed\-list again. But it is OK.
+This concatenation will be skipped when the (original) filename\-list
+is empty.
+
+
+.SS Supporting the errors
+The aufs move\-down ioctl(2) returns the various errors, and we should
+handle them case\-by\-case carefully.
+
+.TP
+.B EBUSY
+The file to be moved\-down is in\-use currently, and aufs rejects
+it to proceed.
+The filename is appended to the failed\-file\-list and should be
+tried later.
+
+.TP
+.B EROFS
+The same named file already exists on the readonly branch which
+is upper than the next writable branch. For instance,
+.RS
+.Bu
+/aufs = /rw0 + /ro1 + /rw2.
+.Bu
+/ro1/fileA exists.
+.Bu
+/rw0/fileA exists too.
+.Bu
+/rw0 becomes nearly full (exceeds the upper watermark), and
+the move\-down begins.
+.Bu
+the daemon finds /aufs/fileA and requests aufs to move it
+down to rw2.
+.Bu
+aufs finds /ro1/fileA and rejects the operation.
+.RE
+
+In this case, the file should not be tried anymore. The filename
+is simply removed from the list, not appended to the failed\-list.
+
+.TP
+.B ENOENT
+The filename existed when the lister ran, but it is removed
+later (before being moved\-down).
+The file should not be tried anymore.
+
+.TP
+.B EPERM
+.TQ
+.B EFAULT
+.TQ
+.B EINVAL
+.TQ
+.B EBADF
+.TQ
+.B EEXIST (if not forcing)
+They all mean the internal errors. Let's enjoy debugging.
+
+.TP
+.B ENOMEM
+A single move\-down operation doesn't require so much memory, but
+a little. If it happens, then then the daemon appends the
+filename to the failed\-filename\-list. And it will be retried
+later.
+
+.\" ----------------------------------------------------------------------
+.\" .SH ENVIRONMENT
+
+.\" ----------------------------------------------------------------------
+.\" .SH NOTES
+.\" In autumn in 2011, I have discussed with a few people about how we
+.\" implement and provide
+.\" the FHSM feature with comparing the implementaion in block\-device layer
+.\" versus filesystem layer.
+
+.\" If we consider FHSM as a sort of caching mechanism, Linux Devicce Mapper
+.\" will be a better option. But we want to provide the feature
+.\" not only caching but also extending the capacity (the filesystem size).
+.\" And we found it will be unrealistic if we implement it in DM.
+
+.\" Finally we decided implementing it as a new feature of AUFS (advanced
+.\" multi layered unification filesystem).
+
+.\" ----------------------------------------------------------------------
+.\" .SH BUGS
+.\" ----------------------------------------------------------------------
+.\" .SH EXAMPLE
+.\" ----------------------------------------------------------------------
+.SH SEE ALSO
+.BR aufs (5),
+.BR aumvdown (8),
+.BR aufhsm (8),
+.BR aufhsmd (8),
+.BR aufhsm-list (8)
+
+.SH COPYRIGHT
+Copyright \(co 2011\-2014 Junjiro R. Okajima
+
+.SH AUTHOR
+Junjiro R. Okajima

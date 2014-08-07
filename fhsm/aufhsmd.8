@@ -1,0 +1,68 @@
+.\" .so aufhsm-inc.8
+.\" .so an-ext.tmac
+.\" see groff_man(7)
+
+.TH aufhsmd 8 Linux "Linux Aufs User's Manual"
+.SH NAME
+aufhsmd \- File-based Hierarchical Storage Management (FHSM) in AUFS, the
+daemon
+
+.\" ----------------------------------------------------------------------
+.SH SYNOPSIS
+.SY aufhsmd
+.RI [ option ]
+.RI AufsMountPoint
+.YS
+
+.\" ----------------------------------------------------------------------
+.SH DESCRIPTION
+Monitor the notification from aufs and move-down the files from the
+upper branch to the lower according to the watermarks and branch
+attributes.
+
+Usually the controller, aufhsm(8) invokes and terminates this daemon, so
+users have not to run manually. But if you want, you can.
+
+.\" ----------------------------------------------------------------------
+.SH OPTIONS
+.TP
+\-d DIR, \-\-dir DIR
+use DIR to store the aufhsm file-list
+.\" .
+.\" .TP
+.\" \-v, \-\-verbose
+.\" .
+.\" .TP
+.\" \-V, \-\-version
+.
+.TP
+\-h, \-\-help
+
+.\" ----------------------------------------------------------------------
+.SH ERRORS
+.\" ----------------------------------------------------------------------
+.SH ENVIRONMENT
+.TP
+AUFHSM_LIST_DIR
+Has the same effect of \-d option. When both are give, only \-d option
+has its effect.
+
+.\" ----------------------------------------------------------------------
+.SH NOTES
+.\" ----------------------------------------------------------------------
+.SH BUGS
+.\" ----------------------------------------------------------------------
+.SH EXAMPLE
+.\" ----------------------------------------------------------------------
+.SH SEE ALSO
+.BR aufs_fhsm (5),
+.BR aufhsm (8),
+.BR aufhsm-list (8),
+.BR aumvdown (8),
+.BR aufs (5)
+
+.SH COPYRIGHT
+Copyright \(co 2011-2014 Junjiro R. Okajima
+
+.SH AUTHOR
+Junjiro R. Okajima

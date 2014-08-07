@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Junjiro R. Okajima
+ * Copyright (C) 2005-2014 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -251,6 +251,8 @@ int main(int argc, char *argv[])
 	err = !WIFEXITED(status);
 	if (!err)
 		err = WEXITSTATUS(status);
+
+	mng_fhsm(cwd, /*umount*/0);
 
 	if (!err && !flags[Bind]) {
 		if (flags[Update])
