@@ -235,7 +235,6 @@ static int au_run_fhsmd(char *mntpnt, int verbose)
 #endif
 		execve(AUFHSMD_CMD, av, environ);
 		AuFin(AUFHSMD_CMD);
-		//exit(EXIT_FAILURE);
 	} else if (pid > 0) {
 		waited = waitpid(pid, &status, 0);
 		if (waited == pid) {

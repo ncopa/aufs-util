@@ -50,7 +50,7 @@ int do_mvdown1(int *done)
 	struct stat st;
 
 	*done = 1;
-	AuLogDbg("%s", fname.name);
+	AuDbgFhsmLog("%s", fname.name);
 	fd = openat(fhsmd.fd[AuFd_ROOT], fname.name, O_RDONLY);
 	if (fd < 0) {
 		err = -1;
@@ -68,7 +68,7 @@ int do_mvdown1(int *done)
 	}
 
 	e = errno;
-	AuLogDbg("AUFS_CTL_MVDOWN %s, %m", fname.name);
+	AuDbgFhsmLog("AUFS_CTL_MVDOWN %s, %m", fname.name);
 	errno = e;
 	switch (e) {
 	case EROFS:
@@ -114,8 +114,8 @@ int do_mvdown1(int *done)
 		 * continue the operation if another error doesn't happen.
 		 */
 		*done = 0;
-		if (1 || au_opt_test(fhsmd.optflags, VERBOSE)) {
-			char *s = "";
+		if (au_opt_test(fhsmd.optflags, VERBOSE)) {
+			char *s = "??";
 			if (0 <= mvdown.au_errno && mvdown.au_errno < EAU_Last)
 				s = (char *)au_errlist[mvdown.au_errno];
 			AuLogInfo("%s, %s", fname.name, s);
@@ -140,7 +140,7 @@ int do_mvdown1(int *done)
 	}
 
 out:
-	AuLogDbg("err %d", err);
+	AuDbgFhsmLog("err %d", err);
 	return err;
 }
 
@@ -150,7 +150,7 @@ int test_usage(struct aufs_stbr *stbr)
 	float block, inode;
 	struct aufhsm_wmark *wm;
 
-	AuLogDbg("%llu/%llu, %llu/%llu, %d",
+	AuDbgFhsmLog("%llu/%llu, %llu/%llu, %d",
 		 (unsigned long long)stbr->stfs.f_bavail,
 		 (unsigned long long)stbr->stfs.f_blocks,
 		 (unsigned long long)stbr->stfs.f_ffree,
@@ -158,7 +158,7 @@ int test_usage(struct aufs_stbr *stbr)
 		 stbr->brid);
 	block = (float)stbr->stfs.f_bavail / stbr->stfs.f_blocks;
 	inode = (float)stbr->stfs.f_ffree / stbr->stfs.f_files;
-	AuLogDbg("%d, free, block %f, inode %f",
+	AuDbgFhsmLog("%d, free, block %f, inode %f",
 		 stbr->brid, block, inode);
 
 	wm = au_wm_search_brid(stbr->brid, fhsmd.lcopy);
@@ -232,7 +232,7 @@ int do_mvdown(struct aufs_stbr *cur, struct aufs_stbr **next)
 	}
 
 out:
-	AuLogDbg("err %d\n", err);
+	AuDbgFhsmLog("err %d", err);
 	return err;
 }
 
@@ -267,7 +267,7 @@ int mvdown_child(struct aufs_stbr *cur, struct aufs_stbr **next)
 		AuLogErr("listfd");
 		goto out;
 	}
-	AuLogDbg("st_size %llu", (unsigned long long)st.st_size);
+	AuDbgFhsmLog("st_size %llu", (unsigned long long)st.st_size);
 	if (!st.st_size)
 		goto out; /* nothing to move-down */
 
@@ -284,7 +284,7 @@ int mvdown_child(struct aufs_stbr *cur, struct aufs_stbr **next)
 			break;
 
 		err = do_mvdown(cur, next);
-		//AuLogDbg("err %d, listsz %llu", err, (unsigned long long)listsz);
+		AuDbgFhsmLog("err %d, listsz %llu", err, (unsigned long long)listsz);
 		if (err <= 0
 		    //|| !listsz
 		    || *next
@@ -293,7 +293,7 @@ int mvdown_child(struct aufs_stbr *cur, struct aufs_stbr **next)
 	}
 
 out:
-	AuLogDbg("err %d\n", err);
+	AuDbgFhsmLog("err %d", err);
 	return err;
 }
 
@@ -327,7 +327,7 @@ int au_mvdown_run(struct aufs_stbr *cur, struct aufs_stbr **next)
 		pid = fork();
 		if (!pid) {
 			err = mvdown_child(cur, next);
-			AuLogDbg("err %d", err);
+			AuDbgFhsmLog("err %d", err);
 			exit(err);
 		} else if (pid > 0) {
 			in_ope->pid = pid;

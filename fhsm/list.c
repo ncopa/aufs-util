@@ -46,7 +46,7 @@ int au_list_dir_set(char *dir, int need_ck)
 	errno = EINVAL;
 	err = -1;
 	if (!dir || !*dir) {
-		AuLogErr("empty string is not allowed");
+		AuLogErr("internal error, empty string is not allowed");
 		goto out;
 	}
 
@@ -228,10 +228,9 @@ int run_cmd(int brfd, char *dir, char *name)
 		err = fchdir(brfd);
 		if (!err) {
 			execve(AUFHSM_LIST_CMD, av, environ);
-			AuLogErr("aufhsm-list");
+			AuLogFin("aufhsm-list");
 		} else
-			AuLogErr("fchdir");
-		exit(EXIT_FAILURE);
+			AuLogFin("fchdir");
 	} else if (pid > 0) {
 		waited = waitpid(pid, &status, 0);
 		if (waited == pid)
@@ -279,7 +278,7 @@ int au_list(int brfd, int *listfd, int *failfd)
 			 S_IRUSR | S_IWUSR);
 	err = *listfd;
 	if (err < 0) {
-		AuLogErr("%s", name);
+		AuLogErr("%s/%s", dir, name + 1);
 		goto out_dirfd;
 	}
 
@@ -290,7 +289,7 @@ int au_list(int brfd, int *listfd, int *failfd)
 			 S_IRUSR | S_IWUSR);
 	err = *failfd;
 	if (err < 0) {
-		AuLogErr("%s", name);
+		AuLogErr("%s/%s", dir, name + 1);
 		goto out_listfd;
 	}
 
@@ -368,7 +367,7 @@ int au_fname_failed(struct au_fname *fname, int failfd)
 	ssize_t ssz;
 	off_t off;
 
-	/* AuLogDbg("%s", fname->atime); */
+	/* AuDbgFhsmLog("%s", fname->atime); */
 
 	err = 0;
 	l = strlen(fname->atime) + 1; /* including the terminator */
@@ -378,7 +377,7 @@ int au_fname_failed(struct au_fname *fname, int failfd)
 
 	err = -1;
 	e = errno;
-	AuWarn("failed appending %s (%zd), skipped", fname->atime, ssz);
+	AuLogInfo("failed appending %s (%zd), skipped", fname->atime, ssz);
 	if (ssz > 0) {
 		/* wrote partially */
 		off = lseek(failfd, SEEK_END, -ssz);

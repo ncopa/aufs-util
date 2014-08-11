@@ -78,6 +78,12 @@ extern int au_do_syslog;
 #define AuLogDbg(fmt, ...)			\
 	AuDoLog(LOG_DEBUG, fmt, ##__VA_ARGS__)
 
+#ifdef AUFHSM_DBG
+#define AuDbgFhsmLog(fmt, ...)	AuLogDbg(fmt, ##__VA_ARGS__)
+#else
+#define AuDbgFhsmLog(fmt, ...)	do {} while (0)
+#endif
+
 #define AuLogFin(fmt, ...) do {						\
 		AuLogErr(fmt, ##__VA_ARGS__);				\
 		exit(EXIT_FAILURE);					\

@@ -119,7 +119,7 @@ out:
 static_unless_ut
 int au_shm_open(char *name, int oflags, mode_t mode)
 {
-	int fd, err;
+	int fd, err, e;
 	struct statfs stfs;
 	struct flock fl = {
 		.l_type		= F_RDLCK,
@@ -131,8 +131,11 @@ int au_shm_open(char *name, int oflags, mode_t mode)
 	fd = shm_open(name, oflags, mode);
 	if (fd < 0) {
 		/* keep this errno */
-		if (errno != EEXIST)
+		if (errno != EEXIST) {
+			e = errno;
 			AuLogErr("%s", name);
+			errno = e;
+		}
 		goto out;
 	}
 	if (oflags & (O_WRONLY | O_RDWR))
@@ -145,15 +148,17 @@ int au_shm_open(char *name, int oflags, mode_t mode)
 	err = fstatfs(fd, &stfs);
 	if (!err) {
 		if (stfs.f_type == AUFS_SUPER_MAGIC)
-			AuLogWarn1("%s should not be aufs (not an error)\n",
+			AuLogWarn1("%s should not be aufs (not an error)",
 				   name);
 		goto out; /* success */
 	}
 	AuLogErr("%s", name);
 
 out_fd:
+	e = errno;
 	if (close(fd))
 		AuLogErr("%s", name);
+	errno = e;
 	fd = -1;
 out:
 	return fd;

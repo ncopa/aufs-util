@@ -203,6 +203,6 @@ int main(int argc, char *argv[])
 	/* main loop */
 	err = au_fhsmd_loop();
 
-	AuLogDbg("exit %d", err);
+	AuDbgFhsmLog("exit %d", err);
 	return err;
 }
