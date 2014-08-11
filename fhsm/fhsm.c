@@ -366,8 +366,8 @@ void au_fhsm_dump(char *mntpnt, struct aufhsm *fhsm, union aufs_brinfo *brinfo,
 	for (i = 0; i < nbr; i++) {
 		wm = au_wm_search_brid(brinfo[i].id, fhsm);
 		if (wm)
-			printf("%s %.2f-%.2f %.2f-%.2f\n",
-			       brinfo[i].path,
+			printf("%s, %d, %.2f-%.2f %.2f-%.2f\n",
+			       brinfo[i].path, brinfo[i].id,
 			       (1 - wm->block[AuFhsm_WM_UPPER]) * 100,
 			       (1 - wm->block[AuFhsm_WM_LOWER]) * 100,
 			       (1 - wm->inode[AuFhsm_WM_UPPER]) * 100,
