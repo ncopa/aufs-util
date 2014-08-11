@@ -25,7 +25,14 @@
 #include <error.h>
 #endif
 
-#define AuVersion "aufs-util for aufs3.9 and later"
+#define AuRelease	"2014????"
+#ifdef AUFHSM
+#define AuFhsmStr " with FHSM"
+#else
+#define AuFhsmStr ""
+#endif
+#define AuVersionGitBranch "aufs3.9 and later"
+#define AuVersion "aufs-util for " AuVersionGitBranch AuFhsmStr " " AuRelease
 
 /*
  * error_at_line() is decleared with (__printf__, 5, 6) attribute,
