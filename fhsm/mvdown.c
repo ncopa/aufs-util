@@ -114,8 +114,8 @@ int do_mvdown1(int *done)
 		 * continue the operation if another error doesn't happen.
 		 */
 		*done = 0;
-		if (1 || au_opt_test(fhsmd.optflags, VERBOSE)) {
-			char *s = "";
+		if (au_opt_test(fhsmd.optflags, VERBOSE)) {
+			char *s = "??";
 			if (0 <= mvdown.au_errno && mvdown.au_errno < EAU_Last)
 				s = (char *)au_errlist[mvdown.au_errno];
 			AuLogInfo("%s, %s", fname.name, s);
