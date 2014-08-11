@@ -88,7 +88,7 @@ int au_fhsmd_load(void)
 		goto out;
 	errno = 0;
 	AuLogDbg("n %d --> %d", n, fhsmd.lcopy->nwmark);
-	if (n >= fhsmd.lcopy->nwmark) {
+	if (n > fhsmd.lcopy->nwmark) {
 		AuLogWarn("unmatching watermarks. re-run aufhsm");
 		goto out;
 	}
