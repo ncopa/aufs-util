@@ -148,7 +148,7 @@ int au_shm_open(char *name, int oflags, mode_t mode)
 	err = fstatfs(fd, &stfs);
 	if (!err) {
 		if (stfs.f_type == AUFS_SUPER_MAGIC)
-			AuLogWarn1("%s should not be aufs (not an error)\n",
+			AuLogWarn1("%s should not be aufs (not an error)",
 				   name);
 		goto out; /* success */
 	}

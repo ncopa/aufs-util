@@ -51,14 +51,11 @@ int fhsm_shrink(int shmfd, struct aufhsm **rfhsm, int nfhsm)
 	int err;
 	off_t len, cur_len;
 	struct aufhsm *fhsm;
-	//struct aufhsm_wmark *wm;
 
 	fhsm = *rfhsm;
 	cur_len = au_fhsm_size(fhsm->nwmark);
 	len = au_fhsm_size(nfhsm);
-	//AuLogDbg("%lld --> %lld", (long long)cur_len, (long long)len);
-	//wm = fhsm->wmark;
-	//memmove(wm, wm + fhsm->nwmark - nfhsm, sizeof(*wm) * nfhsm);
+	AuDbgFhsmLog("%lld --> %lld", (long long)cur_len, (long long)len);
 
 	err = ftruncate(shmfd, len);
 	if (err) {
@@ -95,7 +92,7 @@ int fhsm_expand(int shmfd, struct aufhsm **rfhsm, int nfhsm)
 	fhsm = *rfhsm;
 	cur_len = au_fhsm_size(fhsm->nwmark);
 	len = au_fhsm_size(nfhsm);
-	AuLogDbg("%lld --> %lld", (long long)cur_len, (long long)len);
+	AuDbgFhsmLog("%lld --> %lld", (long long)cur_len, (long long)len);
 	err = ftruncate(shmfd, len);
 	if (err) {
 		AuLogErr("ftruncate %lld, %lld",
@@ -242,7 +239,7 @@ static int fhsm_map(char *name, int *rshmfd, struct aufhsm **rfhsm)
 
 	err = -1;
 	errno = EINVAL;
-	AuLogErr("%s is broken", name);
+	AuLogErr("%s has broken signature", name);
 	if (munmap(p, au_fhsm_size(p->nwmark)))
 		AuLogErr("%s", name);
 	if (close(*rshmfd))

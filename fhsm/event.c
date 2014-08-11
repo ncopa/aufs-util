@@ -87,7 +87,7 @@ int au_fhsmd_load(void)
 	if (!fhsmd.lcopy)
 		goto out;
 	errno = 0;
-	AuLogDbg("n %d --> %d", n, fhsmd.lcopy->nwmark);
+	AuDbgFhsmLog("n %d --> %d", n, fhsmd.lcopy->nwmark);
 	if (n > fhsmd.lcopy->nwmark) {
 		AuLogWarn("unmatching watermarks. re-run aufhsm");
 		goto out;
@@ -132,7 +132,7 @@ read:
 	nstbr = fhsmd.comm->nstbr;
 	len = nstbr * sizeof(*stbr);
 	ssz = read(fhsmd.fd[AuFd_FHSM], stbr, len);
-	AuLogDbg("ssz %zd", ssz);
+	AuDbgFhsmLog("ssz %zd", ssz);
 	if (!ssz)
 		goto out;
 
@@ -202,7 +202,7 @@ int handle_msg(int *msg_exit)
 		goto out;
 	}
 
-	AuLogDbg("Got message %d", msg);
+	AuDbgFhsmLog("Got message %d", msg);
 	switch (msg) {
 	case AuFhsm_MSG_READ:
 		err = au_fhsmd_load();
@@ -244,8 +244,8 @@ int handle_sig(int *status)
 		AuLogErr("AuFd_SIGNAL");
 		goto out;
 	}
-	AuLogDbg("[%d] got signal %u, pid %d, status %d",
-		 getpid(), ssi.ssi_signo, ssi.ssi_pid, ssi.ssi_status);
+	AuDbgFhsmLog("[%d] got signal %u, pid %d, status %d",
+		     getpid(), ssi.ssi_signo, ssi.ssi_pid, ssi.ssi_status);
 
 	err = ssi.ssi_signo;
 	switch (ssi.ssi_signo) {
@@ -379,19 +379,19 @@ int au_fhsmd_loop(void)
 							  err);
 				} else if (sig)
 					done = 1;
-				AuLogDbg("sig %d, done %d", sig, done);
+				AuDbgFhsmLog("sig %d, done %d", sig, done);
 			} else if (events[i].data.fd == fhsmd.fd[AuFd_MSG]) {
 				err = handle_msg(&msg_exit);
 				if (!err && msg_exit) {
 					done = 1;
-					AuLogDbg("done %d", done);
+					AuDbgFhsmLog("done %d", done);
 				}
 			} else if (events[i].data.fd == fhsmd.fd[AuFd_FHSM]) {
 				if (!done) {
 					err = handle_fhsm();
 					if (err) {
 						done = 1;
-						AuLogDbg("done %d", done);
+						AuDbgFhsmLog("done %d", done);
 					}
 				}
 			} else {
