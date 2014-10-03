@@ -263,7 +263,8 @@ int main(int argc, char *argv[])
 	union aufs_brinfo *brinfo, *sorted;
 
 	do_notify = 0;
-	if (0 && getuid()) {
+	/* better to test the capability? */
+	if (getuid()) {
 		errno = EPERM;
 		AuFin(NULL);
 	}
