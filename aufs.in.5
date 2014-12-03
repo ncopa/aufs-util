@@ -217,6 +217,14 @@ TODO: costomizable two values for upper limit
 \" .B trunc_xino_v=n:n
 .
 .TP
+.B acl
+.TQ
+.B noacl
+Enable or disable POSIX Access Control List. This feature is totally
+depending upon the branch fs. If your branch fs doesn't support POSIX
+ACL, these options are meaningless. CONFIG_FS_POSIX_ACL is required.
+.
+.TP
 .B create_policy | create=CREATE_POLICY
 .TQ
 .B copyup_policy | copyup | cpup=COPYUP_POLICY
