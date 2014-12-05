@@ -501,7 +501,7 @@ See linux/Documentation/ABI/*/{sys,debug}fs\-aufs.
 .TQ
 .B permission := rw | ro | rr
 .TQ
-.B attribute := wh | nolwh | unpin | coo_reg | coo_all | moo | fhsm
+.B attribute := wh | nolwh | unpin | coo_reg | coo_all | moo | fhsm | icexsec | icexsys | icextr | icexusr | icexoth | icex
 dir_path is a directory path.
 The keyword after `dir_path=' is a
 permission flags for that branch.
@@ -668,6 +668,30 @@ Specifies that this branch is a participant of aufs FHSM. Refer to
 .B
 aufs_fhsm(5)
 in detail.
+.
+.TP
+.B icexsec | icexsys | icextr | icexusr | icexoth | icex
+Ignore the error on copying\-up/down XATTR.
+When an internal copy\-up/down happens, aufs tries copying all XATTRs.
+Here an error can happen because of the XATTR support on the dst
+branch may different from the src branch. If you know how the branch
+supports or un-supports XATTR, you can specify these attributes.
+`icexsec' means to ignore an error on copying\-up/down XATTR categorized
+as "security" (for LSM and capability). And `icexsys,' `icextr,' and
+`icexusr,' are for "system" (for posix ACL), "trusted" and "user"
+categories individually.
+`icexoth' is for any other category. To be convenient, `icex` sets them
+all.
+See also linux/Documentation/filesystems/aufs/design/06xattr.txt.
+
+These attributes are essentially for the writable branches. But when you
+use
+.B
+aufs_fhsm(5),
+you may want to
+specify them to the readonly branchs too. So they are available for the
+readonly branches.
+
 
 .\" .SS FUSE as a branch
 .\" A FUSE branch needs special attention.
