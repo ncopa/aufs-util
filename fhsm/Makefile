@@ -44,7 +44,7 @@ ${LibFhsm}: $(foreach o, ${LibFhsmObj}, ${LibFhsm}(${o}))
 ${TgtObj}: %.o: %.c ${LibFhsmHdr} $(addprefix ../, ${LibUtilHdr}) ${LibFhsm}
 #${Tgt}: override LDFLAGS += -static
 ${Tgt}: override LDFLAGS += -s
-${Tgt}: override LDLIBS += -lrt -L. -lfhsm -L.. -lautil
+${Tgt}: override LDLIBS += -L. -lfhsm -L.. -lautil -lrt
 
 ########################################
 
