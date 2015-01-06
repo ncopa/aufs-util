@@ -31,7 +31,7 @@
 #else
 #define AuFhsmStr ""
 #endif
-#define AuVersionGitBranch "aufs3.9 and later"
+#define AuVersionGitBranch "aufs3.14 and later"
 #define AuVersion "aufs-util for " AuVersionGitBranch AuFhsmStr " " AuRelease
 
 /*
