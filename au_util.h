@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Junjiro R. Okajima
+ * Copyright (C) 2005-2015 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include <error.h>
 #endif
 
-#define AuRelease	"20150112"
+#define AuRelease	"20150126"
 #ifdef AUFHSM
 #define AuFhsmStr " with FHSM"
 #else
