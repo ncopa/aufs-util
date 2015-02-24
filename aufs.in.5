@@ -123,7 +123,7 @@ is mapping a file by mmap(2)
 on the branch, the process may or may not
 be able to modify its mapped memory region after modifying branch
 permission flags.
-Additioanlly when you enable CONFIG_IMA (in linux\-2.6.30 and later), IMA
+Additionally when you enable CONFIG_IMA (in linux\-2.6.30 and later), IMA
 may produce some wrong messages. But this is equivalent when the
 filesystem is changed `ro' in emergency.
 (cf. Branch Syntax).
@@ -211,7 +211,7 @@ The default is notrunc_xino.
 These options are already implemented, but its design is not fixed
 (cf. External Inode Number Bitmap, Translation Table and Generation Table).
 
-TODO: costomizable two values for upper limit
+TODO: customizable two values for upper limit
 \" .
 \" .TP
 \" .B trunc_xino_v=n:n
@@ -237,7 +237,7 @@ try keeping their operations in the branch where the source exists.
 .TP
 .B dio
 Enable Direct I/O support (including Linux AIO), and always make open(2)
-with O_DIRECT success. But if your branch filessystem doesn't support
+with O_DIRECT success. But if your branch filesystem doesn't support
 it, then the succeeding I/O will fail
 (cf, Direct I/O).
 .
@@ -262,7 +262,7 @@ This is default value.
 .B sum
 df(1)/statfs(2) returns the total number of blocks and inodes of
 all branches.
-When the block size of all branches are not equal, aufs choses the
+When the block size of all branches are not equal, aufs chooses the
 smallest one and calculate the number of blocks (including bavail and
 bfree).
 Note that there are cases that systemcalls may return ENOSPC, even if
@@ -417,11 +417,11 @@ document about this feature. See Tips file in the aufs CVS tree.
 .B dirperm1
 .TQ
 .B nodirperm1
-By default (nodirperm1), aufs repects the directory permission bits on
+By default (nodirperm1), aufs respects the directory permission bits on
 all branches equally, which means if the permission bits for a directory
 on a lower readonly branch prohibits you to read, then you cannot read
 even if you run "chmod a+rx" (and aufs copies it up).
-With this option (dirperm1), the behaviour changes and aufs checks the
+With this option (dirperm1), the behavior changes and aufs checks the
 permission bits of the directory on the topmost branch and the
 permission bits on all lower branches are ignored.
 In other words, you read a directory even if the lower readonly branch
@@ -628,10 +628,10 @@ also the writable branches. `coo_reg' handles the regular files only and
 `coo_all' handles the regular files plus the directories. All special
 files and symlinks will not be copied\-up.
 Additionally NFS server may not issue open(2) when NFS client issues
-open(2). This behaviour means that the file may not be copied\-up when
+open(2). This behavior means that the file may not be copied\-up when
 NFS client issues open(2).
 
-The internal copy\-up operataion by these attributes are unrelated to
+The internal copy\-up operation by these attributes are unrelated to
 the COPYUP_POLICY
 (cf. Policies to Select One among Multiple Writable Branches),
 which means `copy\-up on open' always choose the nearest upper writable
@@ -639,7 +639,7 @@ branch.
 Even if there are multiple writable branches set these attributes,
 the internal copy\-up operation is done once, not recursively.
 
-Users who have many (over 100) branches want to know and analyse
+Users who have many (over 100) branches want to know and analyze
 when and what file is copied\-up. To insert a new upper branch which
 contains such files only may improve the performance of aufs.
 The `copy\-up on open' itself may not be so attractive, but combining
@@ -654,7 +654,7 @@ after the successful operation. This attribute handles the regular files
 only, and obviously cannot be specified to the readonly branch.
 
 Users can specify all these attributes for a single writable branch, but
-only the last specifed one has its effect. Other coo/moo attributes are
+only the last specified one has its effect. Other coo/moo attributes are
 silently ignored.
 
 The `move\-up on open' itself may not be so attractive, but combining
@@ -675,7 +675,7 @@ Ignore the error on copying\-up/down XATTR.
 When an internal copy\-up/down happens, aufs tries copying all XATTRs.
 Here an error can happen because of the XATTR support on the dst
 branch may different from the src branch. If you know how the branch
-supports or un-supports XATTR, you can specify these attributes.
+supports or unsupports XATTR, you can specify these attributes.
 `icexsec' means to ignore an error on copying\-up/down XATTR categorized
 as "security" (for LSM and capability). And `icexsys,' `icextr,' and
 `icexusr,' are for "system" (for posix ACL), "trusted" and "user"
@@ -689,7 +689,7 @@ use
 .B
 aufs_fhsm(5),
 you may want to
-specify them to the readonly branchs too. So they are available for the
+specify them to the readonly branches too. So they are available for the
 readonly branches.
 
 
@@ -1024,7 +1024,7 @@ to their private files, you do not have to worry about this issue.
 
 If you do not want this feature, use `noplink' mount option.
 
-.SS The behaviours of plink and noplink
+.SS The behaviors of plink and noplink
 This sample shows that the `f_src_linked2' with `noplink' option cannot follow
 the link.
 
@@ -1036,7 +1036,7 @@ ls: ./copied: No such file or directory
 15 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ../ro/f_src_linked2
 22 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ./f_src_linked
 22 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ./f_src_linked2
-$ echo abc >> f_src_linked
+$ echo FOO >> f_src_linked
 $ cp f_src_linked copied
 $ ls -li ../r?/f_src_linked* ./f_src_linked* ./copied
 15 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ../ro/f_src_linked
@@ -1055,7 +1055,7 @@ ls: ./copied: No such file or directory
 17 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ../ro/f_src_linked2
 23 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ./f_src_linked
 23 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ./f_src_linked2
-$ echo abc >> f_src_linked
+$ echo FOO >> f_src_linked
 $ cp f_src_linked copied
 $ ls -li ../r?/f_src_linked* ./f_src_linked* ./copied
 17 -rw-r--r--  2 jro jro 2 Dec 22 11:03 ../ro/f_src_linked
@@ -1114,7 +1114,7 @@ test about UDBA. With this option, aufs runs fastest, but it may show
 you incorrect data.
 Additionally, if you often modify a branch
 directly, aufs will not be able to trace the changes of inodes on the
-branch. It can be a cause of wrong behaviour, deadlock or anything else.
+branch. It can be a cause of wrong behavior, deadlock or anything else.
 
 It is recommended to use this option only when you are sure that
 nobody access a file on a branch.
@@ -1182,7 +1182,7 @@ file which is on the lower branch.
 When the file is cached as positive or existed, and a user renamed the
 file by rename(2) directly. Aufs detects the inode of the file is
 still existing. You may or may not see both of the old and new files.
-Todo: If aufs also tests the name, we can detect this case.
+TODO: If aufs also tests the name, we can detect this case.
 .RE
 
 If your outer modification (UDBA) is rare and you can ignore the
@@ -1257,7 +1257,7 @@ IN_DELETE event. It depends upon the status of dentry
 (DCACHE_NFSFS_RENAMED flag).
 In this case, the file on aufs seems still exists. Aufs and any user can see
 the file.
-Since linux\-3.15\-rc1, this behaviour has been changed and NFS fires the
+Since linux\-3.15\-rc1, this behavior has been changed and NFS fires the
 event from itself.
 
 .SS IN_IGNORED, deleted rename target
@@ -1385,7 +1385,7 @@ Just simply run your application.
 The dynamic link library libau.so implements
 another readdir routine, and all readdir(3) calls in your application
 will be handled by libau.so.
-For setting environment variables, you may want to use a shell funtion
+For setting environment variables, you may want to use a shell function
 or alias such like this.
 
 .nf
@@ -1474,8 +1474,8 @@ truncate the xino/xib files. Sometimes those files can be large and may
 take a long time to handle them.
 
 \" .SS a regular file in HFSPLUS
-\" HFSPLUS acquires an inode mutex lock at closing a file. This behaviour
-\" is not a problem, but aufs doesn't expect such behaviour and it had
+\" HFSPLUS acquires an inode mutex lock at closing a file. This behavior
+\" is not a problem, but aufs doesn't expect such behavior and it had
 \" caused a deadlock. So aufs added a special handling to copy\-up a
 \" regular file in HFSPLUS, eg. opens the file internally twice. It means
 \" there exists an additional overhead in copying a regular file in HFSPLUS.
@@ -1558,7 +1558,7 @@ all are created on the same branch.
 Selects a writable branch which has most free space. In order to keep
 the performance, you can specify the duration (`second') which makes
 aufs hold the index of last selected writable branch until the
-specified seconds expires. The seconds is upto \*[AUFS_MFS_MAX_SEC]
+specified seconds expires. The seconds is up to \*[AUFS_MFS_MAX_SEC]
 seconds.
 The first time you create something in aufs
 after the specified seconds expired, aufs checks the amount of free
@@ -1646,7 +1646,7 @@ The branch filesystems must be accessible, which means `not hidden.'
 It means you need to `mount \-\-move' when you use initramfs and
 switch_root(8), or chroot(8).
 .Bu
-Since aufs has several filename prefixes reserved, the maxmum filename
+Since aufs has several filename prefixes reserved, the maximum filename
 length is shorter than ordinary 255. Actually \*[AUFS_MAX_NAMELEN]
 (defined as ${AUFS_MAX_NAMELEN}). This
 value should be specified as `namlen=' when you mount NFS.
@@ -1684,7 +1684,7 @@ Aufs copies\-up the file from the lower ext2 to the upper tmpfs, and re-opens th
 file in tmpfs with O_DIRECT. It fails and returns an error.
 .RE
 
-This behaviour may be a problem since application expects the error
+This behavior may be a problem since application expects the error
 should be returned from the first open(2) instead of the later
 write(2), when the filesystem doesn't support Direct I/O.
 (But, in real world, I don't think there is an application
@@ -1693,12 +1693,12 @@ problem actually).
 
 If the file exists in the upper tmpfs, the first open(2) will fail
 expectedly. So there is no problem in this case. But the problem may
-happen when the internal copyup happens and the behaviour of the branch
+happen when the internal copyup happens and the behavior of the branch
 differs from each other. As long as the feature depends upon the filesystem, this
 problem will not be solved. So aufs sets `nodio` by default, which means
-all Direct I/O are disabled, and oepn(2) with O_DIRECT always fails. If
+all Direct I/O are disabled, and open(2) with O_DIRECT always fails. If
 you want to use Direct I/O
-AND all your writeble branches support it, then specify `dio' option to
+AND all your writable branches support it, then specify `dio' option to
 make it in effect.
 
 
@@ -1753,7 +1753,7 @@ aufs may copyup even if the copyup\-src branch is specified as writable.
 For example, you have two writable branches and a large regular file
 on the lower writable branch. When you issue rename(2) to the file on aufs,
 aufs may copyup it to the upper writable branch.
-If this behaviour is not what you want, then you should rename(2) it
+If this behavior is not what you want, then you should rename(2) it
 on the lower branch directly.
 
 And there is a simple shell
@@ -1898,7 +1898,7 @@ and lockf(3), is applied to virtual aufs file only, not to the file on a
 branch. It means you can break the lock by accessing a branch directly.
 TODO: check `security' to hook locks, as inotify does.
 
-Aufs repects all "security" hooks in kernel, so you can configure LSM
+Aufs respects all "security" hooks in kernel, so you can configure LSM
 for both of virtual aufs files and real branch\-fs files. But there is
 one exception, it is the kernel function "security_mmap_file()." The
 function called inside aufs for a branch\-fs file may cause a deadlock,
@@ -1912,8 +1912,8 @@ instead of the copied\-up one.
 
 The fsync(2) and fdatasync(2) systemcalls return 0 which means success, even
 if the given file descriptor is not opened for writing.
-I am afraid this behaviour may violate some standards. Checking the
-behaviour of fsync(2) on ext2, aufs decided to return success.
+I am afraid this behavior may violate some standards. Checking the
+behavior of fsync(2) on ext2, aufs decided to return success.
 
 If you want to use disk quota, you should set it up to your writable
 branch since aufs does not have its own block device.
@@ -1933,7 +1933,7 @@ directory.
 
 To rename(2) directory may return EXDEV even if both of src and tgt
 are on the same aufs. When the rename\-src dir exists on multiple
-branches and the lower dir has child(ren), aufs has to copyup all his
+branches and the lower dir has child/children, aufs has to copyup all his
 children. It can be recursive copyup. Current aufs does not support
 such huge copyup operation at one time in kernel space, instead
 produces a warning and returns EXDEV.
@@ -1942,7 +1942,7 @@ rename(2) or copy/unlink recursively. So the result is harmless.
 If your application which issues rename(2) for a directory does not
 support EXDEV, it will not work on aufs.
 Also this specification is applied to the case when the src directory
-exists on the lower readonly branch and it has child(ren).
+exists on the lower readonly branch and it has child/children.
 
 While it is rare, users can open a removed file with a little help
 from procfs.
@@ -1975,7 +1975,7 @@ cached info and the real info from the branch, and tries refreshing by
 re-lookup. Finally aufs finds
 the file is removed and let open(2) return an error.
 For the former case, currently (linux\-3.13\-rc7), aufs simply follows the
-behaviour of ext2 which supports for opening a non\-direcotry but returns
+behavior of ext2 which supports for opening a non\-directory but returns
 an error for a directory.
 Other than open(2), users may chmod(2) and chown(2) similary (remove the
 file and then operate it via procfs). Ext2 supports them too, but aufs
@@ -2036,7 +2036,7 @@ different uid/gid/permission, /ro
 .\" And the next example shows the modifications to the files under /rw branch
 .\" will be copied-up to /new/a.
 .\"
-.\" Todo: test multiple writable branches policy. cpup=nearest, cpup=exist_parent.
+.\" TODO: test multiple writable branches policy. cpup=nearest, cpup=exist_parent.
 .\"
 .\" .nf
 .\" # mount -v -t aufs br:/rw:/ro none /u
@@ -2103,7 +2103,7 @@ originally. In aufs, it is very dangerous, particularly for
 whiteouts. Finally aufs sets the maximum link count for ramfs. The
 value is 32000 which is borrowed from ext2.
 
-After you prepend a branch which already has some entires, aufs may
+After you prepend a branch which already has some entries, aufs may
 report an I/O Error with "brabra should be negative" or something. For
 instance,
 you are going to open(2) a regular file in aufs and write(2) something
@@ -2118,7 +2118,7 @@ a regular file FOO exists in aufs.
 open the file FOO.
 .Bu
 add a branch which has FOO but it is a directory, and change the
-permssion of the old branch to RO.
+permission of the old branch to RO.
 .Bu
 write to the file FOO.
 .Bu
@@ -2147,10 +2147,10 @@ an error when you try using FOO.
 .\" briefly describes the command or function's interface.  For  commands,  this
 .\" shows the syntax of the command and its arguments (including options); bold-
 .\" face is used for as-is text and italics are  used  to  indicate  replaceable
-.\" arguments. Brackets ([]) surround optional arguments, vertical bars (|) sep-
-.\" arate choices, and ellipses (...) can be repeated.  For functions, it  shows
-.\" any required data declarations or #include directives, followed by the func-
-.\" tion declaration.
+.\" arguments. Brackets ([]) surround optional arguments, vertical bars (|)
+.\" separate choices, and ellipses (...) can be repeated.  For functions, it  shows
+.\" any required data declarations or #include directives, followed by the
+.\" function declaration.
 .
 .\" DESCRIPTION
 .\" gives an explanation of what the command, function, or format does.  Discuss
@@ -2187,8 +2187,8 @@ an error when you try using FOO.
 .
 .\" SECURITY
 .\" discusses security issues and implications.  Warn  about  configurations  or
-.\" environments  that should be avoided, commands that may have security impli-
-.\" cations, and so on, especially if they aren't obvious.  Discussing  security
+.\" environments  that should be avoided, commands that may have security
+.\" implications, and so on, especially if they aren't obvious.  Discussing  security
 .\" in  a  separate section isn't necessary; if it's easier to understand, place
 .\" security information in the other sections (such as the DESCRIPTION or USAGE
 .\" section).  However, please include security information somewhere!
