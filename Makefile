@@ -36,7 +36,7 @@ override CPPFLAGS += -DUMOUNT_CMD=\"${UmountCmd}\"
 #
 # BuildFHSM: specify building FHSM tools
 #
-BuildFHSM = yes
+BuildFHSM = no
 ifeq (${BuildFHSM},yes)
 override CPPFLAGS += -DAUFHSM
 LibUtilObj = mng_fhsm.o

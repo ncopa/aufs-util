@@ -63,10 +63,10 @@ Makefile in this tree has some customizable make-variables.
   "/bin/mount" and "/bin/umount" individually.
 
 - BuildFHSM
-  specify "no" if you don't want FHSM tools or if you disabled
+  specify "yes" if you want FHSM tools or if you enabled
   CONFIG_AUFS_FHSM when you built your aufs kernel module.
-  The default is BuildFHSM=yes.
-	$ make BuildFHSM=no
+  The default is BuildFHSM=no.
+	$ make BuildFHSM=yes
 
 o /sbin/mount.aufs, /sbin/umount.aufs
   Helpers for util-linux-ng package. You should NOT invoke them
