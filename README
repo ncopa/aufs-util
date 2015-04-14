@@ -8,21 +8,21 @@ If you forget to install them, your aufs may not work correctly.
 And these are not for aufs1 essentially, except aubrsync. See below in
 detail.
 
-You will find GIT branches whose name is in form of "aufs3.x" where "x"
-represents the linux kernel version, "linux-3.x". For instance,
-"aufs3.0" is for linux-3.0.
+You will find GIT branches whose name is in form of "aufs4.x" where "x"
+represents the linux kernel version, "linux-4.x". For instance,
+"aufs4.0" is for linux-4.0.
 
 You may not be able to find the GIT branch in aufs-util for your
 version. In this case, you should git-checkout the branch for the
 nearest lower number.
-If you are using linux-3.10 and aufs3.10 (which are not released yet),
-but the "aufs3.10" branch doesn't exit in this repository, then
-"aufs3.9", "aufs3.8", ... or something is the branch for you.
+If you are using linux-4.10 and aufs4.10 (which are not released yet),
+but the "aufs4.10" branch doesn't exit in this repository, then
+"aufs4.9", "aufs4.8", ... or something is the branch for you.
 Also you can view all branches by
 	$ git branch -a
 
-Note: The 3.x-rcN branch is to be used with `rc' kernel versions ONLY.
-The minor version number, 'x' in '3.x', of aufs may not always
+Note: The 4.x-rcN branch is to be used with `rc' kernel versions ONLY.
+The minor version number, 'x' in '4.x', of aufs may not always
 follow the minor version number of the kernel.
 Because changes in the kernel that cause the use of a new
 minor version number do not always require changes to aufs-util.
@@ -37,7 +37,7 @@ Makefile in this tree has some customizable make-variables.
   + run "make headers_install" in your kernel source tree, and
     $LinuxSrc/usr/include is created and header files are installed
     there by default.
-  + if you build aufs3 as module from aufs3-standalone.git, then
+  + if you build aufs4 as module from aufs4-standalone.git, then
     $AufsStdalone/usr/include is created and header files are
     installed there.
   + and specify
