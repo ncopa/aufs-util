@@ -25,7 +25,7 @@
 int main(int argc, char *argv[])
 {
 	regex_t preg;
-	const char *pat = "^4\\.[0-9][0-9]";
+	const char *pat = "^4\\.[0-9][0-9]?";
 
 	if (regcomp(&preg, pat, REG_EXTENDED | REG_NOSUB))
 		AuFin("regcomp");
