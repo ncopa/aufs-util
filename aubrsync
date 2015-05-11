@@ -124,7 +124,8 @@ _move()
 		if [ $src_is_nfs -eq 1 ]
 		then
 			mount -o remount "$mntpnt"
-			mount -o remount "$src"
+			# remount for NFSv4 is unreliable
+			mount -o remount "$src" || :
 		fi
 		xargs -r0 rm -fr #-v
 	}
