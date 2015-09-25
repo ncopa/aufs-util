@@ -1236,6 +1236,11 @@ If the pseudo\-linked file is hardlinked or unlinked on the branch
 directly, its inode link count in aufs may be incorrect. It is
 recommended to flush the pseudo\-links by auplink script.
 
+In linux-4.2 (and later, probably), NFS doesn't show the changes at once
+and returns ESTALE even if you set udba=notify.
+It is a natural behaviour of linux nfs's
+and aufs can do nothing about it. Probably simple "sleep 1" will help.
+
 .\" ----------------------------------------------------------------------
 .SH Linux Inotify Limitation
 Unfortunately, current inotify (linux\-2.6.18) has some limitations,
