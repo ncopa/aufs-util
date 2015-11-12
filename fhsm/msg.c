@@ -44,7 +44,8 @@ static void wait_for_terminate(int rootfd)
 		if (fhsmfd > 0) {
 			close(fhsmfd);
 			break;
-		}
+		} else if (fhsmfd == -1 && errno == EOPNOTSUPP)
+			break;
 		ts.tv_sec = 0;
 		ts.tv_nsec = 100 * 1000;
 		nanosleep(&ts, NULL);
