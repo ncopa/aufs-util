@@ -304,7 +304,7 @@ The default value is \*[AUFS_DIRWH_DEF].
 Specifies a size of internal VDIR block which is allocated at a time in
 byte.
 The VDIR block will be allocated several times when necessary. If your
-directory has millions of files, you may want to expand this size.
+directory has tens of thousands of files, you may want to expand this size.
 The default value is defined as \*[AUFS_RDBLK_DEF].
 The size has to be lager than NAME_MAX (usually 255) and kmalloc\-able
 (the maximum limit depends on your system. at least 128KB is available
@@ -324,7 +324,7 @@ Specifies a size of internal VDIR hash table which is used to compare
 the file names under the same named directory on multiple branches.
 The VDIR hash table will be allocated in readdir(3)/getdents(2),
 rmdir(2) and rename(2) for the existing target directory. If your
-directory has millions of files, you may want to expand this size.
+directory has tens of thousands of files, you may want to expand this size.
 The default value is defined as \*[AUFS_RDHASH_DEF].
 The size has to be lager than zero, and it will be multiplied by 4 or 8
 (for 32\-bit and 64\-bit respectively, currently). The result must be
@@ -1307,7 +1307,7 @@ During building dir blocks, aufs creates hash list (hashed and divided by
 the entry is whiteout-ed by its upper branch or already listed.
 
 These values are suitable for normal environments. But you may have
-millions of files or very long filenames under a single directory. For
+tens of tousands of files or very long filenames under a single directory. For
 such cases, you may need to customize these values by specifying rdblk=
 and rdhash= aufs mount options.
 
@@ -1330,7 +1330,7 @@ not, the number of comparison will be 4. 2 memory allocations
 and 4 comparison costs low (even if the directory is opened for a long
 time). So you do not need to customize.
 
-If your directory has millions of files, the you will need to specify
+If your directory has tens of thousands of files, the you will need to specify
 rdblk= and rdhash=.
 
 .nf
@@ -1381,8 +1381,9 @@ If you use pathconf(3)/fpathconf(3) with _PC_LINK_MAX for aufs, you need
 to use libau.so.
 
 .SS VDIR/readdir(3) in user\-space (RDU)
-If you have a directory which has millions of files, aufs VDIR consumes
-much memory. You may meet "out of memory" message due to
+If you have a directory which has tens of thousands of files, aufs VDIR consumes
+much memory. So the program which reads a huge directory may produce an
+"out of memory" or "page allocation failure" message in the syslog, due to
 the memory fragmentation or real starvation.
 In this case, RDU (readdir(3) in user\-space) may help you.
 Because the kernel memory space cannot be swappable and consuming much
