@@ -25,7 +25,7 @@
 #include <error.h>
 #endif
 
-#define AuRelease	"20151116"
+#define AuRelease	"20160215"
 #ifdef AUFHSM
 #define AuFhsmStr " with FHSM"
 #else
