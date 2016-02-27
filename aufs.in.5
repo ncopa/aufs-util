@@ -1265,7 +1265,7 @@ later (until CONFIG_INOTIFY is removed actually), you can choose either
 `udba=notify', and aufs interprets it as an abstract name.
 
 To rename/rmdir a directory on a branch directory may reveal the same named
-directory on the lower branch. Aufs tries re-lookuping the renamed
+directory on the lower branch. Aufs tries re-looking up the renamed
 directory and the revealed directory and assigning different inode
 number to them. But the inode number including their children can be a
 problem. The inode numbers will be changed silently, and
@@ -1355,7 +1355,7 @@ During building dir blocks, aufs creates hash list (hashed and divided by
 the entry is whiteout-ed by its upper branch or already listed.
 
 These values are suitable for normal environments. But you may have
-tens of tousands of files or very long filenames under a single directory. For
+tens of thousands of files or very long filenames under a single directory. For
 such cases, you may need to customize these values by specifying rdblk=
 and rdhash= aufs mount options.
 
@@ -1725,7 +1725,7 @@ and it tries reading /sys/fs/aufs/si_XXX/brNNN.
 The Direct I/O (including Linux AIO) is a
 filesystem (and its backend block device) specific feature.
 And there is a minor problem around the aufs internal
-copyup. If you have two branches, lower RO ext2 and upper RW tmpfs. As
+copyup. Assume you have two branches, lower RO ext2 and upper RW tmpfs. As
 you know ext2 supports Direct I/O, but tmpfs doesn't. When a
 `fileA' exists in the lower ext2, and you write something into after
 opening it with
@@ -2039,7 +2039,7 @@ the file is removed and let open(2) return an error.
 For the former case, currently (linux\-3.13\-rc7), aufs simply follows the
 behavior of ext2 which supports for opening a non\-directory but returns
 an error for a directory.
-Other than open(2), users may chmod(2) and chown(2) similary (remove the
+Other than open(2), users may chmod(2) and chown(2) similarly (remove the
 file and then operate it via procfs). Ext2 supports them too, but aufs
 doesn't. I don't think it a big disadvantage since users can fchmod(2)
 and fchown(2) instead.
