@@ -495,6 +495,54 @@ The default is `0' (disable).
 See linux/Documentation/ABI/*/{sys,debug}fs\-aufs.
 
 .\" ----------------------------------------------------------------------
+.SH For the better performance
+In order to gain a better performance, there are a few steps. They are
+essentially to drop the features from aufs, and to gain a performance in
+return for them. You don't have to drop all of them. It may be too
+much. Try step by step with measuring the performance you want using
+your typical workload.
+
+.SS Patch file
+.
+As my recommendation, there is one patch file in aufs[34]\-standalone.git
+tree, tmpfs\-idr.patch. It introduces IDR for
+the tmpfs inode\-number management, and has an effect to prevent the
+size of aufs's XINO/XIB files to grow rapidly. If you don't use TMPFS as
+your branch, the patch won't be necessary.
+
+.SS Configuration
+.
+Disable all unnecessary ones except CONFIG_AUFS_RDU (readdir in
+user\-space). RDU requires an external user\-space library libau.so, but
+it is so effective particularly for the directory which has tens of
+thousands of files. To use RDU, users have to set LD_PRELOAD environment
+variable. If he doesn't set, this configuration will do no harm. The
+size of aufs module will be larger a little, but the time\-performance
+(speed) won't be damaged.
+
+.SS Mount option
+.
+As a first step, I'd recommend you to try `dirperm1' and `udba=none.'
+The former prohibits aufs to dig down the lower branches in checking the
+directory permission bits, and the latter makes aufs not to watch the
+external modification, eg. by\-passing aufs (users' direct branch access).
+These options are able to be changed and restored anytime.
+
+For the second step, try `notrunc_xino' and `notrunc_xib.'
+It is not always when they are so effective. Especially if you have
+applied tmpfs\-idr.patch, then the effect is small since the most
+of effect is done by the patch. But there surely exists their effect. In
+this case, the size of XINO and XIB will grow only, not truncated. In
+other word, it is a time\-vs\-space issue.
+
+For the third and last step, try `noplink' and `noxino.'
+With these options, aufs behaves unreliably a little, which means lose
+the features maintaining the hard\-link (pseudo\-link) and the inode
+numbers. Some behaviours may surprise users, but many internal process
+will be skipped and the result performance will be better.
+
+
+.\" ----------------------------------------------------------------------
 .SH Branch Syntax
 .TP
 .B dir_path[ =permission [ + attribute ] ]
