@@ -1759,6 +1759,8 @@ you want to use Direct I/O
 AND all your writable branches support it, then specify `dio' option to
 make it in effect.
 
+With the similar reason, fcntl(F_SETFL, O_DIRECT) will not work for aufs
+file descriptor.
 
 .\" ----------------------------------------------------------------------
 .SH Possible problem of the inode number in TMPFS
