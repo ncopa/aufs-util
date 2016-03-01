@@ -495,6 +495,54 @@ The default is `0' (disable).
 See linux/Documentation/ABI/*/{sys,debug}fs\-aufs.
 
 .\" ----------------------------------------------------------------------
+.SH For the better performance
+In order to gain a better performance, there are a few steps. They are
+essentially to drop the features from aufs, and to gain a performance in
+return for them. You don't have to drop all of them. It may be too
+much. Try step by step with measuring the performance you want using
+your typical workload.
+
+.SS Patch file
+.
+As my recommendation, there is one patch file in aufs[34]\-standalone.git
+tree, tmpfs\-idr.patch. It introduces IDR for
+the tmpfs inode\-number management, and has an effect to prevent the
+size of aufs's XINO/XIB files to grow rapidly. If you don't use TMPFS as
+your branch, the patch won't be necessary.
+
+.SS Configuration
+.
+Disable all unnecessary ones except CONFIG_AUFS_RDU (readdir in
+user\-space). RDU requires an external user\-space library libau.so, but
+it is so effective particularly for the directory which has tens of
+thousands of files. To use RDU, users have to set LD_PRELOAD environment
+variable. If he doesn't set, this configuration will do no harm. The
+size of aufs module will be larger a little, but the time\-performance
+(speed) won't be damaged.
+
+.SS Mount option
+.
+As a first step, I'd recommend you to try `dirperm1' and `udba=none.'
+The former prohibits aufs to dig down the lower branches in checking the
+directory permission bits, and the latter makes aufs not to watch the
+external modification, eg. by\-passing aufs (users' direct branch access).
+These options are able to be changed and restored anytime.
+
+For the second step, try `notrunc_xino' and `notrunc_xib.'
+It is not always when they are so effective. Especially if you have
+applied tmpfs\-idr.patch, then the effect is small since the most
+of effect is done by the patch. But there surely exists their effect. In
+this case, the size of XINO and XIB will grow only, not truncated. In
+other word, it is a time\-vs\-space issue.
+
+For the third and last step, try `noplink' and `noxino.'
+With these options, aufs behaves unreliably a little, which means lose
+the features maintaining the hard\-link (pseudo\-link) and the inode
+numbers. Some behaviours may surprise users, but many internal process
+will be skipped and the result performance will be better.
+
+
+.\" ----------------------------------------------------------------------
 .SH Branch Syntax
 .TP
 .B dir_path[ =permission [ + attribute ] ]
@@ -1217,7 +1265,7 @@ later (until CONFIG_INOTIFY is removed actually), you can choose either
 `udba=notify', and aufs interprets it as an abstract name.
 
 To rename/rmdir a directory on a branch directory may reveal the same named
-directory on the lower branch. Aufs tries re-lookuping the renamed
+directory on the lower branch. Aufs tries re-looking up the renamed
 directory and the revealed directory and assigning different inode
 number to them. But the inode number including their children can be a
 problem. The inode numbers will be changed silently, and
@@ -1307,7 +1355,7 @@ During building dir blocks, aufs creates hash list (hashed and divided by
 the entry is whiteout-ed by its upper branch or already listed.
 
 These values are suitable for normal environments. But you may have
-tens of tousands of files or very long filenames under a single directory. For
+tens of thousands of files or very long filenames under a single directory. For
 such cases, you may need to customize these values by specifying rdblk=
 and rdhash= aufs mount options.
 
@@ -1677,7 +1725,7 @@ and it tries reading /sys/fs/aufs/si_XXX/brNNN.
 The Direct I/O (including Linux AIO) is a
 filesystem (and its backend block device) specific feature.
 And there is a minor problem around the aufs internal
-copyup. If you have two branches, lower RO ext2 and upper RW tmpfs. As
+copyup. Assume you have two branches, lower RO ext2 and upper RW tmpfs. As
 you know ext2 supports Direct I/O, but tmpfs doesn't. When a
 `fileA' exists in the lower ext2, and you write something into after
 opening it with
@@ -1711,6 +1759,8 @@ you want to use Direct I/O
 AND all your writable branches support it, then specify `dio' option to
 make it in effect.
 
+With the similar reason, fcntl(F_SETFL, O_DIRECT) will not work for aufs
+file descriptor.
 
 .\" ----------------------------------------------------------------------
 .SH Possible problem of the inode number in TMPFS
@@ -1989,7 +2039,7 @@ the file is removed and let open(2) return an error.
 For the former case, currently (linux\-3.13\-rc7), aufs simply follows the
 behavior of ext2 which supports for opening a non\-directory but returns
 an error for a directory.
-Other than open(2), users may chmod(2) and chown(2) similary (remove the
+Other than open(2), users may chmod(2) and chown(2) similarly (remove the
 file and then operate it via procfs). Ext2 supports them too, but aufs
 doesn't. I don't think it a big disadvantage since users can fchmod(2)
 and fchown(2) instead.
@@ -2216,7 +2266,7 @@ an error when you try using FOO.
 .\" activities.
 
 .SH COPYRIGHT
-Copyright \(co 2005\-2015 Junjiro R. Okajima
+Copyright \(co 2005\-2016 Junjiro R. Okajima
 
 .SH AUTHOR
 Junjiro R. Okajima
