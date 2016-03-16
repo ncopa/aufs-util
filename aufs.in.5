@@ -541,6 +541,59 @@ the features maintaining the hard\-link (pseudo\-link) and the inode
 numbers. Some behaviours may surprise users, but many internal process
 will be skipped and the result performance will be better.
 
+.\" ----------------------------------------------------------------------
+.SH Git work\-tree and aufs
+Git has a cache called `index' file. In this cache there are the
+identity of the files individually. Here `identity' means a pair of
+struct stat.st_{dev,ino}. (Git may consider other stat members too. But
+the essential part of the identity is still dev and ino.)
+
+Since aufs is a virtual filesystem and manages the inode numbers, it
+provides its own st_dev and st_ino. They differ from the `index' cache
+in git, and some git operations have to refresh the `index' cache, which
+may take long time.
+For instance,
+.RS
+.Bu
+/branch/ro has 0x0801 for its st_dev
+.Bu
+/branch/ro/proj.git/fileA has 100 for its st_ino
+.Bu
+/branch/ro/proj.git/.git/index contains {0x0801,100} as fileA's
+  identity
+.Bu
+mount /u as /branch/rw + /branch/ro, /u is aufs
+.Bu
+we can see the contents of /u/proj.git/.git/index is equivalent to
+  /branch/ro/proj.git/.git/index
+.RE
+
+In this case, aufs provides {0x0802,110} (for example) for fileA's
+identity, which is different from /branch/ro/proj.git/fileA.
+If you run git\-diff or something, the
+behaviour of git differs a little.
+.RS
+.Bu
+git issues stat(2) and gets st_{dev,ino} pair.
+.Bu
+git compares the gotten pair and the one in the index file.
+.Bu
+when they are different from each other, git opens the file, reads all
+  data, compares it with the cached data, and finds there is nothing
+  changed.
+.Bu
+if the gotten pair is equal to the one in the index file, then
+  open/read/compare steps will be skipped.
+.RE
+
+This issue can happen when you copy the git working tree to somewhere
+else. All files identity will be changed by the copy and the cached
+identity in index file will be obsoleted.
+Once you complete git\-status or something, the index file will be
+updated, and full open/read/compare steps will not happen anymore.
+This behaviour of git can be controlled by git's configuration
+core.checkstat.
+
 
 .\" ----------------------------------------------------------------------
 .SH Branch Syntax
