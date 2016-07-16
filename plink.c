@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Junjiro R. Okajima
+ * Copyright (C) 2005-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -247,10 +247,11 @@ void au_clean_plink(void)
 
 static int do_plink(char *cwd, int cmd, int nbr, union aufs_brinfo *brinfo)
 {
-	int err, i, l;
+	int err, i, l, nopenfd;
 	struct rlimit rlim;
 	__nftw_func_t func;
 	char *p;
+#define OPEN_LIMIT 1024
 
 	err = 0;
 	switch (cmd) {
@@ -296,7 +297,14 @@ static int do_plink(char *cwd, int cmd, int nbr, union aufs_brinfo *brinfo)
 	err = getrlimit(RLIMIT_NOFILE, &rlim);
 	if (err)
 		AuFin("getrlimit");
-	nftw(cwd, func, rlim.rlim_cur - 10,
+	nopenfd = (int)rlim.rlim_cur;
+	if (rlim.rlim_cur == RLIM_INFINITY
+	    || rlim.rlim_cur > OPEN_LIMIT
+	    || nopenfd <= 0)
+		nopenfd = OPEN_LIMIT;
+	else if (nopenfd > 20)
+		nopenfd -= 10;
+	nftw(cwd, func, nopenfd,
 	     FTW_PHYS | FTW_MOUNT | FTW_ACTIONRETVAL);
 	/* ignore */
 
@@ -317,6 +325,7 @@ static int do_plink(char *cwd, int cmd, int nbr, union aufs_brinfo *brinfo)
 	free(ia.o);
 	free(na.o);
 	return err;
+#undef OPEN_LIMIT
 }
 
 int au_plink(char cwd[], int cmd, unsigned int flags, int *fd)
