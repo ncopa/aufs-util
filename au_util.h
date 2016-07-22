@@ -25,7 +25,7 @@
 #include <error.h>
 #endif
 
-#define AuRelease	"20160718"
+#define AuRelease	"20160725"
 #ifdef AUFHSM
 #define AuFhsmStr " with FHSM"
 #else
@@ -55,7 +55,7 @@ void au_perror(const char *s);
 #ifndef __GNU_LIBRARY__
 /* musl libc has 'program_invocation_name', but doesn't have error_at_line() */
 void error_at_line(int status, int errnum, const char *filename,
-		   unsigned int linenum, const char *format, ...)
+		   unsigned int linenum, const char *format, ...);
 #endif
 
 /* proc_mounts.c */
