@@ -68,6 +68,10 @@ Makefile in this tree has some customizable make-variables.
   The default is BuildFHSM=no.
 	$ make BuildFHSM=yes
 
+- NoLibcFTW
+  specify "yes" if your libc doesn't support FTW_ACTIONRETVAL which was
+  added since glibc-v2.3.3.
+
 o /sbin/mount.aufs, /sbin/umount.aufs
   Helpers for util-linux-ng package. You should NOT invoke them
   manually. Just install them by "make install".
