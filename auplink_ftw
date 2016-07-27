@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# usage: $0 inum_list dir list|cpup
+
+tmp=/tmp/$$
+set -eu
+rc=${DebugRc:-/etc/default/aufs}
+. $rc
+
+inum=$1
+dir=$2
+action=$3
+
+# build the grep pattern
+sed -e 's/^/^/' $inum > $tmp.inum
+
+Find()
+{
+	find $dir -xdev -name $AUFS_WH_PLINKDIR -prune \
+		-o -printf "%i %p\n" | #2> /dev/null |
+	grep -w -f $tmp.inum |
+	cut -f2- -d' ' ||
+	:
+}
+
+err=0
+case $3 in
+list)
+	Find
+	;;
+cpup)
+	Find |
+	xargs -r touch -a
+	;;
+*)
+	echo Usage
+	err=1
+	;;
+esac
+
+rm -fr $tmp $tmp.*
+exit $err
