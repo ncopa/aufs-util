@@ -245,6 +245,66 @@ void au_clean_plink(void)
 #endif
 }
 
+#ifdef NO_LIBC_FTW
+#define FTW_ACTIONRETVAL 0
+static int au_nftw(const char *dirpath,
+		   int (*fn) (const char *fpath, const struct stat *sb,
+			      int typeflag, struct FTW *ftwbuf),
+		   int nopenfd, int flags)
+{
+	int err, fd, i;
+	mode_t mask;
+	FILE *fp;
+	ino_t *p;
+	char *action, ftw[1024], tmp[] = "/tmp/auplink_ftw.XXXXXX";
+
+	mask = umask(S_IRWXG | S_IRWXO);
+	fd = mkstemp(tmp);
+	if (fd < 0)
+		AuFin("mkstemp");
+	umask(mask);
+	fp = fdopen(fd, "r+");
+	if (!fp)
+		AuFin("fdopen");
+
+	ia.p = ia.o;
+	p = ia.cur;
+	for (i = 0; i < ia.nino; i++) {
+		err = fprintf(fp, "%llu\n", (unsigned long long)*p++);
+		if (err < 0)
+			AuFin("%s", tmp);
+	}
+	err = fflush(fp) || ferror(fp);
+	if (err)
+		AuFin("%s", tmp);
+	err = fclose(fp);
+	if (err)
+		AuFin("%s", tmp);
+
+	action = "list";
+	if (fn == ftw_cpup)
+		action = "cpup";
+	else
+		fflush(stdout); /* inode numbers */
+	i = snprintf(ftw, sizeof(ftw), "auplink_ftw %s %s %s",
+		     tmp, dirpath, action);
+	if (i > sizeof(ftw))
+		AuFin("snprintf");
+	err = system(ftw);
+	if (err == -1)
+		AuFin("%s", ftw);
+	else if (WEXITSTATUS(err))
+		AuFin("%s", ftw);
+
+	return err;
+}
+#else
+#define au_nftw nftw
+#ifndef FTW_ACTIONRETVAL
+#error FTW_ACTIONRETVAL is not defined on your system
+#endif
+#endif
+
 static int do_plink(char *cwd, int cmd, int nbr, union aufs_brinfo *brinfo)
 {
 	int err, i, l, nopenfd;
@@ -304,8 +364,8 @@ static int do_plink(char *cwd, int cmd, int nbr, union aufs_brinfo *brinfo)
 		nopenfd = OPEN_LIMIT;
 	else if (nopenfd > 20)
 		nopenfd -= 10;
-	nftw(cwd, func, nopenfd,
-	     FTW_PHYS | FTW_MOUNT | FTW_ACTIONRETVAL);
+	au_nftw(cwd, func, nopenfd,
+		FTW_PHYS | FTW_MOUNT | FTW_ACTIONRETVAL);
 	/* ignore */
 
 	if (cmd == AuPlink_FLUSH) {

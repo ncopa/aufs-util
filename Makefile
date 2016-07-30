@@ -58,6 +58,11 @@ LibUtil = libautil.a
 LibUtilObj += perror.o proc_mnt.o br.o plink.o mtab.o
 LibUtilHdr = au_util.h
 
+ifeq (${NoLibcFTW},yes)
+override CPPFLAGS += -DNO_LIBC_FTW
+Cmd += auplink_ftw
+endif
+
 # suppress 'eval' for ${v}
 $(foreach v, CPPFLAGS CFLAGS INSTALL Install ManDir LibUtilHdr, \
 	$(eval MAKE += ${v}="$${${v}}"))
@@ -108,6 +113,9 @@ c2sh c2tmac ver: CC = ${HOSTCC}
 .INTERMEDIATE: c2sh c2tmac ver
 
 install_sbin: File = auibusy aumvdown auplink mount.aufs umount.aufs
+ifeq (${NoLibcFTW},yes)
+install_sbin: File += auplink_ftw
+endif
 install_sbin: Tgt = ${DESTDIR}/sbin
 install_ubin: File = aubusy auchk aubrsync #auctl
 install_ubin: Tgt = ${DESTDIR}/usr/bin
