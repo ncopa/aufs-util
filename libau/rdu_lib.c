@@ -144,11 +144,12 @@ struct rdu *rdu_buf_lock(int fd)
 	struct rdu *p;
 	int i;
 
-	assert(rdu);
 	assert(fd >= 0);
 
 	p = NULL;
 	rdu_lib_lock();
+	if (!rdu)
+		goto out;
 	for (i = 0; i < rdu_cur; i++)
 		if (rdu[i] && rdu[i]->fd == fd) {
 			p = rdu[i];
