@@ -22,7 +22,7 @@ set -e
 
 test $# -eq 0 -o "$1" = "-help" -o "$1" = "--help" &&
 cat << EOF 1>&2 && exit 1
-usage: $0 dir [command]
+usage: $0 [--size rw_size] dir [command]
 Makes a jail or chrooted environment under the given dir for the given
 command such as chroot(8), but it is based upon AUFS.
 If you want to hide/modify something under /, then remove/modify it
@@ -32,9 +32,15 @@ This script includes a sample customization for apache on debian
 system. e.g. "sudo sh ./auroot.sh /tmp/jail /etc/init.d/apache2 start"
 EOF
 
+size=64M
+test "$1" = "--size" &&
+{
+	size=$2
+	shift 2
+}
 dir="$1"
 mkdir -p "$dir" "$tmp"
-mount -t tmpfs none "$tmp"
+mount -t tmpfs -o size=$size none "$tmp"
 
 # a sample for generic mount
 #mount -o ro,rbind / $tmp.ro
