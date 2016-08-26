@@ -59,7 +59,9 @@ LibUtilObj += perror.o proc_mnt.o br.o plink.o mtab.o
 LibUtilHdr = au_util.h
 
 ifeq (${NoLibcFTW},yes)
+AuplinkFtwCmd=/sbin/auplink_ftw
 override CPPFLAGS += -DNO_LIBC_FTW
+override CPPFLAGS += -DAUPLINK_FTW_CMD=\"${AuplinkFtwCmd}\"
 Cmd += auplink_ftw
 endif
 
