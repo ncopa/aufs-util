@@ -286,7 +286,7 @@ static int au_nftw(const char *dirpath,
 		action = "cpup";
 	else
 		fflush(stdout); /* inode numbers */
-	i = snprintf(ftw, sizeof(ftw), "auplink_ftw %s %s %s",
+	i = snprintf(ftw, sizeof(ftw), AUPLINK_FTW_CMD " %s %s %s",
 		     tmp, dirpath, action);
 	if (i > sizeof(ftw))
 		AuFin("snprintf");
