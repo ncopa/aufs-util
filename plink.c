@@ -403,8 +403,10 @@ int au_plink(char cwd[], int cmd, unsigned int flags, int *fd)
 
 	if (flags & AuPlinkFlag_OPEN) {
 		p = hasmntopt(&ent, "si");
-		if (!p)
+		if (!p) {
+			errno = EINVAL;
 			AuFin("no aufs mount point");
+		}
 		strncpy(si, p, sizeof(si));
 		p = strchr(si, ',');
 		if (p)
