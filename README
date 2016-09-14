@@ -5,7 +5,7 @@ Junjiro R. Okajima
 
 These utilities are always necessary for aufs.
 If you forget to install them, your aufs may not work correctly.
-And these are not for aufs1 essentially, except aubrsync. See below in
+And these are not for aufs1 essentially, except aubrsync.  See below in
 detail.
 
 You will find GIT branches whose name is in form of "aufs4.x" where "x"
@@ -13,7 +13,7 @@ represents the linux kernel version, "linux-4.x". For instance,
 "aufs4.0" is for linux-4.0.
 
 You may not be able to find the GIT branch in aufs-util for your
-version. In this case, you should git-checkout the branch for the
+version.  In this case, you should git-checkout the branch for the
 nearest lower number.
 If you are using linux-4.10 and aufs4.10 (which are not released yet),
 but the "aufs4.10" branch doesn't exit in this repository, then
@@ -31,7 +31,7 @@ Makefile in this tree has some customizable make-variables.
 - CPPFLAGS
   specify the include path if necessary.
   Some of linux kernel header files are necessary including
-  linux/aufs_type.h. If you have installed kernel header files to
+  linux/aufs_type.h.  If you have installed kernel header files to
   /usr/include, then you may not need to specify CPPFLAGS.
   Otherwise you need to do something like this sample.
   + run "make headers_install" in your kernel source tree, and
@@ -43,7 +43,7 @@ Makefile in this tree has some customizable make-variables.
   + and specify
 	CPPFLAGS="-I $LinuxSrc/usr/include -I $AufsStdalone/usr/include"
   Note that your distribution may contain an obsoleted version of
-  aufs_type.h in /usr/include/linux or something. When you build aufs
+  aufs_type.h in /usr/include/linux or something.  When you build aufs
   utilities, make sure that your compiler refers the correct aufs header
   file which is built by "make headers_install."
 
@@ -58,44 +58,44 @@ Makefile in this tree has some customizable make-variables.
   for native (host side) compiler, since this package requires buiding
   and running some small internal tools.
 
-- MountCmd, UmountCmd
-  specify mount(8) and umount(8) in full path. By default, they are
-  "/bin/mount" and "/bin/umount" individually.
-
 - BuildFHSM
   specify "yes" if you want FHSM tools or if you enabled
-  CONFIG_AUFS_FHSM when you built your aufs kernel module.
-  The default is BuildFHSM=no.
+  CONFIG_AUFS_FHSM when you built your aufs kernel module.  The default
+  is BuildFHSM=no.
 	$ make BuildFHSM=yes
 
 - NoLibcFTW
   specify "yes" if your libc doesn't support FTW_ACTIONRETVAL which was
   added since glibc-v2.3.3.
 
+- MountCmd, UmountCmd
+  specify mount(8) and umount(8) in full path.  By default, they are
+  "/bin/mount" and "/bin/umount" individually.
+
 o /sbin/mount.aufs, /sbin/umount.aufs
-  Helpers for util-linux-ng package. You should NOT invoke them
-  manually. Just install them by "make install".
+  Helpers for util-linux-ng package.  You should NOT invoke them
+  manually.  Just install them by "make install".
 
 o /sbin/auplink
-  Handles aufs pseudo-link at remount/unmount time. You can invoke it
+  Handles aufs pseudo-link at remount/unmount time.  You can invoke it
   manually at anytime.
 
 o /sbin/aumvdown
-  Operates aufs internal feature "move-down" (opposite of
-  "copy-up"). See aumvdown.8 in detail.
+  Operates aufs internal feature "move-down" (opposite of "copy-up").
+  See aumvdown.8 in detail.
 
 o /usr/bin/aubusy
-  Prints PIDs which make the branch busy and un-removable.
-  It runs /sbin/auibusy internally.
+  Prints PIDs which make the branch busy and un-removable. It runs
+  /sbin/auibusy internally.
 
 o /usr/bin/auchk
-  Similar to generic fsck. Checks whether a branch is healthy or not
+  Similar to generic fsck.  Checks whether a branch is healthy or not
   from aufs's point of view.
 
 o /usr/bin/aubrsync
   Move files from the upper writable branch to the lower branch.
   If you use this script with aufs1, then you need to install aufs.shlib
-  to /usr/lib/aufs.shlib. Currently only the 20080211 version is tested
+  to /usr/lib/aufs.shlib.  Currently only the 20080211 version is tested
   for aufs1.
   The development of this script is sponcered by ASUSTek Computer Inc.
   (http://www.asus.com/).
@@ -107,8 +107,8 @@ o /etc/default/aufs
 
 o /usr/lib/libau.so
   A dynamic link library for "readdir(3) in user-space".
-  If you need this , then run "make libau.so install_ulib". And refer to
-  the aufs manual in detail.
+  If you need this , then run "make libau.so install_ulib".  And refer
+  to the aufs manual in detail.
 
 
 Contributions
