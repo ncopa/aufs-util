@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Junjiro R. Okajima
+ * Copyright (C) 2005-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,8 +89,13 @@ static int test_flush(char opts[])
 
 	/* todo: try getsubopt(3)? */
 	err = regcomp(&preg, pat, REG_EXTENDED | REG_NOSUB);
-	if (err)
-		AuFin("regcomp");
+	if (err) {
+		size_t sz;
+		char a[128];
+
+		sz = regerror(err, &preg, a, sizeof(a));
+		AuFin("regcomp: %.*s", (int)sz, a);
+	}
 
 	p = o;
 	while (i--) {
