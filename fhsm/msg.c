@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2015 Junjiro R. Okajima
+ * Copyright (C) 2011-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,8 @@ static void wait_for_terminate(int rootfd)
 		if (fhsmfd > 0) {
 			close(fhsmfd);
 			break;
-		} else if (fhsmfd == -1 && errno == EOPNOTSUPP)
+		} else if (fhsmfd == -1
+			   && (errno == EOPNOTSUPP || errno == EPERM))
 			break;
 		ts.tv_sec = 0;
 		ts.tv_nsec = 100 * 1000;
