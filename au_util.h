@@ -39,8 +39,12 @@
  * and our compiler produces a warning unless args is not given.
  * __VA_ARGS__ does not help the attribute.
  */
-#define AuFin(fmt, ...) \
-	error_at_line(errno, errno, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
+#define AuFin(fmt, ...) do {						\
+		if (!errno)						\
+			errno = -1; /* unknown error */			\
+		error_at_line(errno, errno, __FILE__, __LINE__, fmt,	\
+			      ##__VA_ARGS__);				\
+	} while (0)
 
 #ifdef DEBUG
 #define MTab "/tmp/mtab"
