@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Junjiro R. Okajima
+ * Copyright (C) 2005-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <sys/types.h>
 #include <errno.h>
+#include <limits.h>
 #include <mntent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,7 +72,11 @@ int au_proc_getmntent(char *mntpnt, struct mntent *rent)
 	int found;
 	struct mntent *p, e;
 	FILE *fp;
-	char a[4096 + 1024];
+	char a[4096 + 1024], path[PATH_MAX], *decoded;
+
+	decoded = au_decode_mntpnt(mntpnt, path, sizeof(path));
+	if (!decoded)
+		AuFin("au_decode_mntpnt");
 
 	fp = setmntent(ProcMounts, "r");
 	if (!fp)
@@ -81,7 +86,7 @@ int au_proc_getmntent(char *mntpnt, struct mntent *rent)
 	memset(rent, 0, sizeof(*rent));
 	found = 0;
 	while ((p = getmntent_r(fp, &e, a, sizeof(a))))
-		if (!strcmp(p->mnt_dir, mntpnt)) {
+		if (!strcmp(p->mnt_dir, decoded)) {
 			Dpri("%s, %s, %s, %s, %d, %d\n",
 			     p->mnt_fsname, p->mnt_dir, p->mnt_type,
 			     p->mnt_opts, p->mnt_freq, p->mnt_passno);
@@ -92,7 +97,7 @@ int au_proc_getmntent(char *mntpnt, struct mntent *rent)
 
 	if (!found) {
 		errno = EINVAL;
-		AuFin("%s", mntpnt);
+		AuFin("%s, %s", mntpnt, decoded);
 	}
 
 	return 0;

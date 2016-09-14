@@ -69,7 +69,7 @@ Lib2Path = lib2/glibc
 Lib2Obj = au_nftw.o
 ifeq (${Glibc},no)
 Lib2Path = lib2/non-glibc
-Lib2Obj += error_at_line.o
+Lib2Obj += au_decode_mntpnt.o error_at_line.o
 LibUtilHdr += ${Lib2Path}/error_at_line.h
 override CPPFLAGS += -I${CURDIR}/${Lib2Path}
 endif

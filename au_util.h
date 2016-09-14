@@ -24,8 +24,13 @@
 
 #ifdef __GNU_LIBRARY__
 #include <error.h>
+static inline char *au_decode_mntpnt(char *src, char *dst, int len)
+{
+	return src;
+}
 #else
 #include "error_at_line.h"
+char *au_decode_mntpnt(char *src, char *dst, int len);
 #endif
 
 #define AuRelease	"20160905"
