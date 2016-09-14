@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2015 Junjiro R. Okajima
+# Copyright (C) 2005-2016 Junjiro R. Okajima
 #
 # This program, aufs is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301	 USA
 
 LibSoMajor = 2
-LibSoMinor = 7
+LibSoMinor = 8
 LibSo = libau.so
 LibSoObj = libau.o \
 	rdu_lib.o rdu.o rdu64.o \
