@@ -65,6 +65,20 @@ endef
 $(eval Glibc=$(call test_glibc, ${CC}, ver.c))
 #$(warning Glibc=${Glibc})
 
+ifneq (${CC},${HOSTCC})
+	ifeq (${LibAuDir},)
+$(warning Warning: CC is set, but LibAuDir.)
+		LibAuDir = $(shell ldconfig -p | \
+			fgrep libc. | \
+			head -n 1 | \
+			cut -f2 -d'>' | \
+			xargs -r dirname)
+		ifeq (${LibAuDir},)
+			LibAuDir = /usr/lib
+		endif
+	endif
+endif
+
 Lib2Path = lib2/glibc
 Lib2Obj = au_nftw.o
 ifeq (${Glibc},no)
@@ -88,7 +102,8 @@ Cmd += auplink_ftw
 endif
 
 # suppress 'eval' for ${v}
-$(foreach v, CPPFLAGS CFLAGS INSTALL Install ManDir LibUtilHdr, \
+$(foreach v, CC CPPFLAGS CFLAGS INSTALL Install ManDir TopDir LibUtilHdr \
+	Glibc LibAuDir Lib2Path, \
 	$(eval MAKE += ${v}="$${${v}}"))
 
 all: ver_test ${Man} ${Bin} ${Etc}
@@ -168,8 +183,10 @@ install_man5 install_man8: ${File}
 	${Install} -m 644 ${File} ${Tgt}
 install_man: install_man5 install_man8
 
-install: install_man install_sbin install_ubin install_etc
+install_ulib:
 	${MAKE} -C libau $@
+
+install: install_man install_sbin install_ubin install_etc install_ulib
 	$(call MakeFHSM, $@)
 
 -include priv.mk

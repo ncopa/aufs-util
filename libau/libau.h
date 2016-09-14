@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 Junjiro R. Okajima
+ * Copyright (C) 2009-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,12 @@
 #define __libau_h__
 
 #include <stdio.h>
+
+#ifdef __GNU_LIBRARY__
+#include <error.h>
+#else
+#include "error_at_line.h"
+#endif
 
 int libau_dl(void **real, char *sym);
 int libau_test_func(char *sym);

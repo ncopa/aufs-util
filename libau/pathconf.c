@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 Junjiro R. Okajima
+ * Copyright (C) 2009-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 #include <sys/vfs.h>    /* or <sys/statfs.h> */
 #include <dirent.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
