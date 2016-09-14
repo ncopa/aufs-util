@@ -16,41 +16,26 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdio.h>
-
-#ifndef __GNU_LIBRARY__
+#include <errno.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#endif /* __GNU_LIBRARY__ */
 
-#include <linux/aufs_type.h>
-#include "au_util.h"
+#include "error_at_line.h"
 
-int au_errno;
-const char *au_errlist[EAU_Last] = {
-	[EAU_MVDOWN_OPAQUE]	= "Opaque ancestor",
-	[EAU_MVDOWN_WHITEOUT]	= "Whiteout-ed by ancestor",
-	[EAU_MVDOWN_UPPER]	= "Upper exists",
-	[EAU_MVDOWN_BOTTOM]	= "No writable lower",
-	[EAU_MVDOWN_NOUPPER]	= "No upper exists",
-	[EAU_MVDOWN_NOLOWERBR]	= "No such lower branch"
-};
-
-void au_perror(const char *s)
+/* musl libc has 'program_invocation_name', but doesn't have error_at_line() */
+void error_at_line(int status, int errnum, const char *filename,
+		   unsigned int linenum, const char *format, ...)
 {
-	const char *colon;
+	va_list ap;
 
-	if (!s || !*s)
-		s = colon = "";
-	else
-		colon = ": ";
-
-	if (!au_errno)
-		perror(s);
-	else if (0 < au_errno && au_errno < EAU_Last)
-		fprintf(stderr, "%s%s%s\n", s, colon, au_errlist[au_errno]);
-	else
-		fprintf(stderr, "%s%sUnknown error %d\n", s, colon, au_errno);
-	fflush(stderr);
+	va_start(ap, format);
+	fprintf(stderr, "%s:%s:%d: ",
+		program_invocation_name, filename, linenum);
+	vfprintf(stderr, format, ap);
+	fprintf(stderr, ": %s\n", errnum ? strerror(errnum) : "");
+	va_end(ap);
+	if (status)
+		exit(status);
 }
