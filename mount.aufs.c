@@ -25,6 +25,7 @@
 #define _BSD_SOURCE		/* dirfd */
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <dirent.h>
 #include <mntent.h>
 #include <regex.h>
@@ -32,7 +33,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <wait.h>
 
 #include <linux/aufs_type.h>
 #include "au_util.h"

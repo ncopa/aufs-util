@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2015 Junjiro R. Okajima
+ * Copyright (C) 2011-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifndef __GNU_LIBRARY__
+/* musl libc conflicts with <linux/limits.h> */
+#undef NGROUPS_MAX
+#endif
 #include <linux/aufs_type.h>
 #include "au_util.h"
 
