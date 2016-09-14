@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Junjiro R. Okajima
+ * Copyright (C) 2005-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,12 +147,20 @@ int au_update_mtab(char *mntpnt, int do_remount, int do_verbose)
 		.l_start	= 0,
 		.l_len		= 0
 	};
+	struct mntent ent;
 	char pid_file[sizeof(MTab "~.") + 20];
 	FILE *fp;
 
 	err = statfs(MTab, &stfs);
-	if (stfs.f_type == PROC_SUPER_MAGIC)
+	if (stfs.f_type == PROC_SUPER_MAGIC) {
+		if (do_verbose) {
+			err = au_proc_getmntent(mntpnt, &ent);
+			if (err)
+				AuFin("no such mount point");
+			au_print_ent(&ent);
+		}
 		return 0;
+	}
 
 	snprintf(pid_file, sizeof(pid_file), MTab "~.%d", getpid());
 	fd = open(pid_file, O_RDWR | O_CREAT | O_EXCL,
