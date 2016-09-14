@@ -49,18 +49,37 @@ define MakeFHSM
 endef
 endif
 
+LibUtil = libautil.a
+LibUtilObj += perror.o proc_mnt.o br.o plink.o mtab.o
+LibUtilHdr = au_util.h
+
+TopDir = ${CURDIR}
+# don't use -q for fgrep here since it exits when the string is found,
+# and it causes the broken pipe error.
+define test_glibc
+	$(shell ${1} ${CPPFLAGS} -I ${TopDir}/lib2/non-glibc -E -P -dM ${2} |\
+		fgrep -w __GNU_LIBRARY__ > /dev/null && \
+		echo yes || \
+		echo no)
+endef
+$(eval Glibc=$(call test_glibc, ${CC}, ver.c))
+#$(warning Glibc=${Glibc})
+
+Lib2Path = lib2/glibc
+Lib2Obj = au_nftw.o
+ifeq (${Glibc},no)
+Lib2Path = lib2/non-glibc
+endif
+LibUtilObj += ${Lib2Obj}
+
 Cmd = aubusy auchk aubrsync
 Man = aufs.5
 Etc = etc_default_aufs
 Bin = auibusy aumvdown auplink mount.aufs umount.aufs #auctl
 BinObj = $(addsuffix .o, ${Bin})
-LibUtil = libautil.a
-LibUtilObj += perror.o proc_mnt.o br.o plink.o mtab.o
-LibUtilHdr = au_util.h
 
-ifeq (${NoLibcFTW},yes)
+ifeq (${Glibc},no)
 AuplinkFtwCmd=/sbin/auplink_ftw
-override CPPFLAGS += -DNO_LIBC_FTW
 override CPPFLAGS += -DAUPLINK_FTW_CMD=\"${AuplinkFtwCmd}\"
 Cmd += auplink_ftw
 endif
@@ -77,6 +96,9 @@ all: ver_test ${Man} ${Bin} ${Etc}
 clean:
 	${RM} ${Man} ${Bin} ${Etc} ${LibUtil} libau.so* *~
 	${RM} ${BinObj} ${LibUtilObj}
+	for i in ${Lib2Src}; \
+	do test -L $${i} && ${RM} $${i} || :; \
+	done
 	${MAKE} -C libau $@
 	$(call MakeFHSM, $@)
 
@@ -91,6 +113,11 @@ ${LibUtilObj}: %.o: %.c ${LibUtilHdr}
 #${LibUtil}: ${LibUtil}(${LibUtilObj})
 ${LibUtil}: $(foreach o, ${LibUtilObj}, ${LibUtil}(${o}))
 .NOTPARALLEL: ${LibUtil}
+Lib2Src = $(patsubst %.o,%.c, ${Lib2Obj})
+${Lib2Src}: %: ${Lib2Path}/%
+	ln -sf $< $@
+.INTERMEDIATE: ${Lib2Src}
+${Lib2Obj}: CPPFLAGS += -I${CURDIR}
 
 etc_default_aufs: c2sh aufs.shlib
 	${RM} $@
@@ -115,7 +142,7 @@ c2sh c2tmac ver: CC = ${HOSTCC}
 .INTERMEDIATE: c2sh c2tmac ver
 
 install_sbin: File = auibusy aumvdown auplink mount.aufs umount.aufs
-ifeq (${NoLibcFTW},yes)
+ifeq (${Glibc},no)
 install_sbin: File += auplink_ftw
 endif
 install_sbin: Tgt = ${DESTDIR}/sbin

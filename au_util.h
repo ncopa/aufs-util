@@ -20,6 +20,7 @@
 #define __AUFS_UTIL_H__
 
 #include <errno.h>
+#include <ftw.h>
 
 #ifdef __GNU_LIBRARY__
 #include <error.h>
@@ -78,6 +79,41 @@ union aufs_brinfo *au_br_search_path(char *path, int nbr,
 				     union aufs_brinfo *brinfo);
 #endif
 
+/* lib for plink.c */
+struct ino_array {
+	char *o;
+	int bytes;
+
+	union {
+		char *p;
+		ino_t *cur;
+	};
+	int nino;
+};
+
+int ftw_list(const char *fname, const struct stat *st, int flags,
+	     struct FTW *ftw);
+int ftw_cpup(const char *fname, const struct stat *st, int flags,
+	     struct FTW *ftw);
+
+#ifdef __GNU_LIBRARY__
+static inline int au_nftw(const char *dirpath,
+			  int (*fn) (const char *fpath, const struct stat *sb,
+				     int typeflag, struct FTW *ftwbuf),
+			  int nopenfd, int flags)
+{
+	return nftw(dirpath, fn, nopenfd, flags);
+}
+#else
+#define FTW_ACTIONRETVAL 0 /* dummy */
+typedef int (*__nftw_func_t)(const char *fpath, const struct stat *sb,
+			      int typeflag, struct FTW *ftwbuf);
+int au_nftw(const char *dirpath,
+	    int (*fn) (const char *fpath, const struct stat *sb,
+		       int typeflag, struct FTW *ftwbuf),
+	    int nopenfd, int flags);
+#endif
+
 /* plink.c */
 enum {
 	AuPlink_FLUSH,
@@ -87,6 +123,7 @@ enum {
 #define AuPlinkFlag_OPEN	1UL
 #define AuPlinkFlag_CLOEXEC	(1UL << 1)
 #define AuPlinkFlag_CLOSE	(1UL << 2)
+extern struct ino_array ia;
 int au_plink(char cwd[], int cmd, unsigned int flags, int *fd);
 
 /* mtab.c */

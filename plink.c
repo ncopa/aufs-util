@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <ftw.h>
 #include <mntent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,16 +43,7 @@ static struct name_array {
 	int nname;
 } na;
 
-static struct ino_array {
-	char *o;
-	int bytes;
-
-	union {
-		char *p;
-		ino_t *cur;
-	};
-	int nino;
-} ia;
+struct ino_array ia;
 
 static int na_append(char *plink_dir, char *name)
 {
@@ -145,61 +135,7 @@ static int build_array(char *plink_dir)
 	return err;
 }
 
-static int ia_test(ino_t ino)
-{
-	int i;
-	ino_t *p;
-
-	/* todo: hash table */
-	ia.p = ia.o;
-	p = ia.cur;
-	for (i = 0; i < ia.nino; i++)
-		if (*p++ == ino)
-			return 1;
-	return 0;
-}
-
 /* ---------------------------------------------------------------------- */
-
-static int ftw_list(const char *fname, const struct stat *st, int flags,
-		   struct FTW *ftw)
-{
-	if (!strcmp(fname + ftw->base, AUFS_WH_PLINKDIR))
-		return FTW_SKIP_SUBTREE;
-	if (flags == FTW_D || flags == FTW_DNR)
-		return FTW_CONTINUE;
-
-	if (ia_test(st->st_ino))
-		puts(fname);
-
-	return FTW_CONTINUE;
-}
-
-static int ftw_cpup(const char *fname, const struct stat *st, int flags,
-		   struct FTW *ftw)
-{
-	int err;
-
-	if (!strcmp(fname + ftw->base, AUFS_WH_PLINKDIR))
-		return FTW_SKIP_SUBTREE;
-	if (flags == FTW_D || flags == FTW_DNR)
-		return FTW_CONTINUE;
-
-	/*
-	 * do nothing but update something harmless in order to make it copyup
-	 */
-	if (ia_test(st->st_ino)) {
-		Dpri("%s\n", fname);
-		if (!S_ISLNK(st->st_mode))
-			err = chown(fname, -1, -1);
-		else
-			err = lchown(fname, -1, -1);
-		if (err)
-			AuFin("%s", fname);
-	}
-
-	return FTW_CONTINUE;
-}
 
 /* ---------------------------------------------------------------------- */
 
@@ -244,66 +180,6 @@ void au_clean_plink(void)
 		AuFin("clean");
 #endif
 }
-
-#ifdef NO_LIBC_FTW
-#define FTW_ACTIONRETVAL 0
-static int au_nftw(const char *dirpath,
-		   int (*fn) (const char *fpath, const struct stat *sb,
-			      int typeflag, struct FTW *ftwbuf),
-		   int nopenfd, int flags)
-{
-	int err, fd, i;
-	mode_t mask;
-	FILE *fp;
-	ino_t *p;
-	char *action, ftw[1024], tmp[] = "/tmp/auplink_ftw.XXXXXX";
-
-	mask = umask(S_IRWXG | S_IRWXO);
-	fd = mkstemp(tmp);
-	if (fd < 0)
-		AuFin("mkstemp");
-	umask(mask);
-	fp = fdopen(fd, "r+");
-	if (!fp)
-		AuFin("fdopen");
-
-	ia.p = ia.o;
-	p = ia.cur;
-	for (i = 0; i < ia.nino; i++) {
-		err = fprintf(fp, "%llu\n", (unsigned long long)*p++);
-		if (err < 0)
-			AuFin("%s", tmp);
-	}
-	err = fflush(fp) || ferror(fp);
-	if (err)
-		AuFin("%s", tmp);
-	err = fclose(fp);
-	if (err)
-		AuFin("%s", tmp);
-
-	action = "list";
-	if (fn == ftw_cpup)
-		action = "cpup";
-	else
-		fflush(stdout); /* inode numbers */
-	i = snprintf(ftw, sizeof(ftw), AUPLINK_FTW_CMD " %s %s %s",
-		     tmp, dirpath, action);
-	if (i > sizeof(ftw))
-		AuFin("snprintf");
-	err = system(ftw);
-	if (err == -1)
-		AuFin("%s", ftw);
-	else if (WEXITSTATUS(err))
-		AuFin("%s", ftw);
-
-	return err;
-}
-#else
-#define au_nftw nftw
-#ifndef FTW_ACTIONRETVAL
-#error FTW_ACTIONRETVAL is not defined on your system
-#endif
-#endif
 
 static int do_plink(char *cwd, int cmd, int nbr, union aufs_brinfo *brinfo)
 {

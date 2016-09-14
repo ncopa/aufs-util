@@ -64,10 +64,6 @@ Makefile in this tree has some customizable make-variables.
   is BuildFHSM=no.
 	$ make BuildFHSM=yes
 
-- NoLibcFTW
-  specify "yes" if your libc doesn't support FTW_ACTIONRETVAL which was
-  added since glibc-v2.3.3.
-
 - MountCmd, UmountCmd
   specify mount(8) and umount(8) in full path.  By default, they are
   "/bin/mount" and "/bin/umount" individually.
