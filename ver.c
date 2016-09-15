@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2015 Junjiro R. Okajima
+ * Copyright (C) 2011-2016 Junjiro R. Okajima
  *
  * This program, aufs is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  */
 
 #include <linux/aufs_type.h>
+#undef NDEBUG
+#include <assert.h>
 #include <regex.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,11 +26,12 @@
 
 int main(int argc, char *argv[])
 {
+	int err;
 	regex_t preg;
 	const char *pat = "^4\\.[0-9][0-9]?";
 
-	if (regcomp(&preg, pat, REG_EXTENDED | REG_NOSUB))
-		AuFin("regcomp");
+	err = regcomp(&preg, pat, REG_EXTENDED | REG_NOSUB);
+	assert(!err); /* internal error */
 
 	if (!regexec(&preg, AUFS_VERSION, 0, NULL, 0))
 		return 0;
