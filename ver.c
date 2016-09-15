@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 {
 	int err;
 	regex_t preg;
-	const char *pat = "^4\\.[0-9][0-9]?";
+	const char *pat = "^4\\.[1-9][0-9]?"; /* aufs4.1 and later */
 
 	err = regcomp(&preg, pat, REG_EXTENDED | REG_NOSUB);
 	assert(!err); /* internal error */
