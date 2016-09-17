@@ -33,11 +33,11 @@ rdu64.c: rdu.c
 rdu64.o: override CPPFLAGS += -DRdu64
 .INTERMEDIATE.: rdu64.c
 else
-CPPFLAGS += -I../${Lib2Path}
+CPPFLAGS += -I../${ExtlibPath}
 LibSoObj += error_at_line.o
-LibSoHdr += ../${Lib2Path}/error_at_line.h
+LibSoHdr += ../${ExtlibPath}/error_at_line.h
 
-error_at_line.c: %: ../${Lib2Path}/%
+error_at_line.c: %: ../${ExtlibPath}/%
 	ln -sf $< $@
 .INTERMEDIATE.: error_at_line.c error_at_line.h
 endif

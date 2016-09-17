@@ -57,7 +57,7 @@ TopDir = ${CURDIR}
 # don't use -q for fgrep here since it exits when the string is found,
 # and it causes the broken pipe error.
 define test_glibc
-	$(shell ${1} ${CPPFLAGS} -I ${TopDir}/lib2/non-glibc -E -P -dM ${2} |\
+	$(shell ${1} ${CPPFLAGS} -I ${TopDir}/extlib/non-glibc -E -P -dM ${2} |\
 		fgrep -w __GNU_LIBRARY__ > /dev/null && \
 		echo yes || \
 		echo no)
@@ -79,15 +79,15 @@ $(warning Warning: CC is set, but LibAuDir.)
 	endif
 endif
 
-Lib2Path = lib2/glibc
-Lib2Obj = au_nftw.o
+ExtlibPath = extlib/glibc
+ExtlibObj = au_nftw.o
 ifeq (${Glibc},no)
-Lib2Path = lib2/non-glibc
-Lib2Obj += au_decode_mntpnt.o error_at_line.o
-LibUtilHdr += ${Lib2Path}/error_at_line.h
-override CPPFLAGS += -I${CURDIR}/${Lib2Path}
+ExtlibPath = extlib/non-glibc
+ExtlibObj += au_decode_mntpnt.o error_at_line.o
+LibUtilHdr += ${ExtlibPath}/error_at_line.h
+override CPPFLAGS += -I${CURDIR}/${ExtlibPath}
 endif
-LibUtilObj += ${Lib2Obj}
+LibUtilObj += ${ExtlibObj}
 
 Cmd = aubusy auchk aubrsync
 Man = aufs.5
@@ -103,7 +103,7 @@ endif
 
 # suppress 'eval' for ${v}
 $(foreach v, CC CPPFLAGS CFLAGS INSTALL Install ManDir TopDir LibUtilHdr \
-	Glibc LibAuDir Lib2Path, \
+	Glibc LibAuDir ExtlibPath, \
 	$(eval MAKE += ${v}="$${${v}}"))
 
 all: ver_test ${Man} ${Bin} ${Etc}
@@ -114,7 +114,7 @@ all: ver_test ${Man} ${Bin} ${Etc}
 clean:
 	${RM} ${Man} ${Bin} ${Etc} ${LibUtil} libau.so* *~
 	${RM} ${BinObj} ${LibUtilObj}
-	for i in ${Lib2Src}; \
+	for i in ${ExtlibSrc}; \
 	do test -L $${i} && ${RM} $${i} || :; \
 	done
 	${MAKE} -C libau $@
@@ -131,11 +131,11 @@ ${LibUtilObj}: %.o: %.c ${LibUtilHdr}
 #${LibUtil}: ${LibUtil}(${LibUtilObj})
 ${LibUtil}: $(foreach o, ${LibUtilObj}, ${LibUtil}(${o}))
 .NOTPARALLEL: ${LibUtil}
-Lib2Src = $(patsubst %.o,%.c, ${Lib2Obj})
-${Lib2Src}: %: ${Lib2Path}/%
+ExtlibSrc = $(patsubst %.o,%.c, ${ExtlibObj})
+${ExtlibSrc}: %: ${ExtlibPath}/%
 	ln -sf $< $@
-.INTERMEDIATE: ${Lib2Src}
-${Lib2Obj}: CPPFLAGS += -I${CURDIR}
+.INTERMEDIATE: ${ExtlibSrc}
+${ExtlibObj}: CPPFLAGS += -I${CURDIR}
 
 etc_default_aufs: c2sh aufs.shlib
 	${RM} $@
