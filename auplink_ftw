@@ -33,20 +33,20 @@ sed -e 's/^/^/' $inum > $tmp.inum
 Find()
 {
 	find $dir -xdev -name $AUFS_WH_PLINKDIR -prune \
-		-o -printf "%i %p\n" | #2> /dev/null |
-	grep -w -f $tmp.inum |
-	cut -f2- -d' ' ||
-	:
+		-o -printf "%i %p\0" | #2> /dev/null |
+	grep -z -w -f $tmp.inum |
+	sed -e 's/^[0-9][0-9]* //g' -e 's/\x00[0-9][0-9]* /\x00/g'
 }
 
 err=0
 case $3 in
 list)
-	Find
+	Find |
+	tr '\0' '\n'
 	;;
 cpup)
 	Find |
-	xargs -r touch -a
+	xargs -r0 touch -a
 	;;
 *)
 	echo Usage
