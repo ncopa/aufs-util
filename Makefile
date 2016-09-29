@@ -79,11 +79,9 @@ $(warning Warning: CC is set, but LibAuDir.)
 	endif
 endif
 
-ExtlibPath = extlib/glibc
-ExtlibObj = au_nftw.o
 ifeq (${Glibc},no)
 ExtlibPath = extlib/non-glibc
-ExtlibObj += au_decode_mntpnt.o error_at_line.o
+ExtlibObj += au_decode_mntpnt.o error_at_line.o au_nftw.o
 LibUtilHdr += ${ExtlibPath}/error_at_line.h
 override CPPFLAGS += -I${CURDIR}/${ExtlibPath}
 endif
@@ -94,12 +92,6 @@ Man = aufs.5
 Etc = etc_default_aufs
 Bin = auibusy aumvdown auplink mount.aufs umount.aufs #auctl
 BinObj = $(addsuffix .o, ${Bin})
-
-ifeq (${Glibc},no)
-AuplinkFtwCmd=/sbin/auplink_ftw
-override CPPFLAGS += -DAUPLINK_FTW_CMD=\"${AuplinkFtwCmd}\"
-Cmd += auplink_ftw
-endif
 
 # suppress 'eval' for ${v}
 $(foreach v, CC CPPFLAGS CFLAGS INSTALL Install ManDir TopDir LibUtilHdr \
@@ -160,9 +152,6 @@ c2sh c2tmac ver: CC = ${HOSTCC}
 .INTERMEDIATE: c2sh c2tmac ver
 
 install_sbin: File = auibusy aumvdown auplink mount.aufs umount.aufs
-ifeq (${Glibc},no)
-install_sbin: File += auplink_ftw
-endif
 install_sbin: Tgt = ${DESTDIR}/sbin
 install_ubin: File = aubusy auchk aubrsync #auctl
 install_ubin: Tgt = ${DESTDIR}/usr/bin

@@ -33,6 +33,7 @@
 
 #include <linux/aufs_type.h>
 #include "au_util.h"
+#include "au_nftw.h"
 
 /* todo: try argz? */
 static struct name_array {
@@ -181,6 +182,61 @@ void au_clean_plink(void)
 #endif
 }
 
+static int ia_test(ino_t ino)
+{
+	int i;
+	ino_t *p;
+
+	/* todo: hash table */
+	ia.p = ia.o;
+	p = ia.cur;
+	for (i = 0; i < ia.nino; i++)
+		if (*p++ == ino)
+			return 1;
+	return 0;
+}
+
+/* ---------------------------------------------------------------------- */
+
+int ftw_list(const char *fname, const struct stat *st, int flags,
+	     struct FTW *ftw)
+{
+	if (!strcmp(fname + ftw->base, AUFS_WH_PLINKDIR))
+		return FTW_SKIP_SUBTREE;
+	if (flags == FTW_D || flags == FTW_DNR)
+		return FTW_CONTINUE;
+
+	if (ia_test(st->st_ino))
+		puts(fname);
+
+	return FTW_CONTINUE;
+}
+
+int ftw_cpup(const char *fname, const struct stat *st, int flags,
+	     struct FTW *ftw)
+{
+	int err;
+
+	if (!strcmp(fname + ftw->base, AUFS_WH_PLINKDIR))
+		return FTW_SKIP_SUBTREE;
+	if (flags == FTW_D || flags == FTW_DNR)
+		return FTW_CONTINUE;
+
+	/*
+	 * do nothing but update something harmless in order to make it copyup
+	 */
+	if (ia_test(st->st_ino)) {
+		Dpri("%s\n", fname);
+		if (!S_ISLNK(st->st_mode))
+			err = chown(fname, -1, -1);
+		else
+			err = lchown(fname, -1, -1);
+		if (err)
+			AuFin("%s", fname);
+	}
+
+	return FTW_CONTINUE;
+}
 static int do_plink(char *cwd, int cmd, int nbr, union aufs_brinfo *brinfo)
 {
 	int err, i, l, nopenfd;
