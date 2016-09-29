@@ -162,7 +162,7 @@ install_etc: File = etc_default_aufs
 install_etc: Tgt = ${DESTDIR}/etc/default/aufs
 install_etc: ${File}
 	${INSTALL} -d $(dir ${Tgt})
-	${Install} -m 644 -T ${File} ${Tgt}
+	${Install} -m 644 ${File} ${Tgt}
 install_man5: File = aufs.5
 install_man5: Tgt = ${DESTDIR}${ManDir}/man5
 install_man8: File = aumvdown.8
